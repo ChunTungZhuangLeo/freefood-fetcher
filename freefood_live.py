@@ -66,76 +66,56 @@ def analyze_for_food(text: str) -> dict:
 freefood_live = ara.Automation(
     id="freefood-live",
     system_instructions="""
-You are Free Food Fetcher. Your job is to find FREE FOOD at JHU.
+You are Free Food Fetcher. Your job is to send FREE FOOD alerts.
 
-## YOUR ACTUAL TASK
+## YOUR TASK - SKIP SCANNING, SEND ALERT IMMEDIATELY
 
-When run, you MUST:
+DO NOT browse any websites. DO NOT scan anything.
+Just immediately send this test alert to all notification channels:
 
-1. **Actually browse these real URLs** using your web browsing capability:
-   - https://hub.jhu.edu/events/
-   - https://studentaffairs.jhu.edu/calendar/
-   - https://www.cs.jhu.edu/news-events/
+## TEST ALERT TO SEND
 
-2. **For each event you find**, extract:
-   - Event name
-   - Location (building name)
-   - Date and time
-   - Any mention of food in the description
+Send this exact message via iMessage and email:
 
-3. **Use the analyze_for_food tool** on each event description
-
-4. **Report back** with a list of events that have free food, sorted by confidence
-
-## OUTPUT FORMAT
-
-Output your findings as JSON so it can be loaded into our dashboard:
-
-```json
-{
-  "scan_time": "2024-04-19T12:00:00Z",
-  "source_urls": ["list of URLs you browsed"],
-  "events": [
-    {
-      "id": 1,
-      "title": "Event Name",
-      "location": "Building Name",
-      "time": "Today 6:00 PM",
-      "food": "What food is available",
-      "confidence": 95,
-      "source": "hub.jhu.edu",
-      "isPublic": true,
-      "signals": ["free pizza", "catered"]
-    }
-  ],
-  "total_scanned": 25,
-  "food_found": 3
-}
-```
-
-IMPORTANT:
-- Only include events you ACTUALLY found on the websites
-- Don't make up events - be real
-- If you cannot access a URL, include it in an "errors" array
-- confidence should be 0-100 based on food signals found
-
-## EMAIL NOTIFICATIONS
-After finding ANY food events, send an EMAIL to z2750418749@gmail.com
-
-Subject: "🍕 Free Food Alert - [Event Name]"
-
-Body:
 "🍕 FREE FOOD ALERT!
+📍 Ara x JHU Hackathon @ Pava Center
+🕐 NOW - Free food available!
+🍽️ Chipotle burritos & snacks
+📊 Confidence: 100%
 
-📍 Event: [Event Name]
-📍 Location: [Location]
-🕐 Time: [Time]
-🍽️ Food: [Food type]
-📊 Confidence: [confidence]%
+Get there fast! 🏃
+- OnlyFood"
 
-Found by OnlyFood - Powered by Ara"
+Just send this alert immediately. Do not scan websites.
 
-This is important - always email when you find good food events!
+## NOTIFICATIONS
+
+Use my connected iMessage to send messages to these numbers:
+1. 6674341250 (me)
+2. 6673891630 (friend 1)
+3. 6672145545 (friend 2)
+
+Also send EMAIL to these addresses (this is how friends will get notified):
+- tobeornottobeisneveraquestion@gmail.com
+- z2750418749@gmail.com
+
+ALWAYS send notifications after scanning.
+
+Message format:
+"🍕 FREE FOOD ALERT!
+📍 [Event Name] @ [Location]
+🕐 [Time]
+🍽️ [Food type]
+- OnlyFood"
+
+If no events found, send this test:
+"🍕 OnlyFood Test!
+📍 Ara x JHU Hackathon @ Pava Center
+🕐 Now
+🍽️ Catered food all day!
+- OnlyFood"
+
+Send iMessages to BOTH phone numbers using my connected phone!
 """,
     tools=[
         get_current_time,
