@@ -711,10 +711,375 @@
         }
         .leaflet-popup-tip { background: rgba(10,10,21,0.95); }
 
+        /* Source items */
+        .sources-list {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .source-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .source-item:last-child { border-bottom: none; }
+        .source-item:hover { background: rgba(255,255,255,0.05); }
+
+        .source-item.connected { color: #aaa; }
+        .source-status {
+            margin-left: auto;
+            color: var(--success);
+            font-weight: 700;
+        }
+        .source-status.add { color: var(--info); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Ara Modal */
+        .ara-modal {
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .ara-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ara-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .ara-title-block h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .ara-title-block p {
+            margin: 5px 0 0;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .ara-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            background: var(--card);
+            padding: 5px;
+            border-radius: 12px;
+        }
+
+        .ara-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .ara-tab:hover { background: rgba(255,255,255,0.05); }
+        .ara-tab.active {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #000;
+            font-weight: 600;
+        }
+
+        .ara-section {
+            margin-bottom: 25px;
+        }
+
+        .ara-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Architecture diagram */
+        .ara-architecture {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .ara-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ara-flow-step {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .ara-flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            font-size: 1.2rem;
+        }
+
+        .ara-flow-step:last-child::after { display: none; }
+
+        .ara-flow-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .ara-flow-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .ara-flow-desc {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        /* Terminal */
+        .ara-terminal {
+            background: #0d0d0d;
+            border-radius: 12px;
+            overflow: hidden;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.8rem;
+        }
+
+        .ara-terminal-header {
+            background: #1a1a1a;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ara-terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .ara-terminal-dot.red { background: #ff5f56; }
+        .ara-terminal-dot.yellow { background: #ffbd2e; }
+        .ara-terminal-dot.green { background: #27ca40; }
+
+        .ara-terminal-title {
+            margin-left: 10px;
+            color: #888;
+            font-size: 0.75rem;
+        }
+
+        .ara-terminal-body {
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .ara-terminal-line {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .ara-terminal-line .prompt { color: var(--success); }
+        .ara-terminal-line .cmd { color: white; }
+        .ara-terminal-line .comment { color: #666; }
+        .ara-terminal-line .output { color: #888; }
+        .ara-terminal-line .success { color: var(--success); }
+        .ara-terminal-line .info { color: var(--info); }
+        .ara-terminal-line .warning { color: var(--secondary); }
+
+        /* Code block */
+        .ara-code {
+            background: #0d0d0d;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+        }
+
+        .ara-code .keyword { color: #c678dd; }
+        .ara-code .string { color: #98c379; }
+        .ara-code .function { color: #61afef; }
+        .ara-code .comment { color: #5c6370; }
+        .ara-code .decorator { color: #e5c07b; }
+
+        /* Connector cards */
+        .ara-connectors {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .ara-connector {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .ara-connector:hover {
+            border-color: var(--border);
+            transform: translateY(-3px);
+        }
+
+        .ara-connector.connected {
+            border-color: var(--success);
+            background: rgba(0,255,136,0.05);
+        }
+
+        .ara-connector-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .ara-connector-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .ara-connector-status {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .ara-connector.connected .ara-connector-status {
+            color: var(--success);
+        }
+
+        /* Stats */
+        .ara-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ara-stat {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .ara-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--success), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ara-stat-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Live scan animation */
+        .ara-live-scan {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .ara-scan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .ara-scan-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ara-scan-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        .ara-scan-log {
+            background: #0d0d0d;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ara-scan-line {
+            margin-bottom: 5px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
             .main { grid-template-columns: 1fr; }
             .sidebar, .events-panel { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .ara-connectors { grid-template-columns: repeat(2, 1fr); }
+            .ara-stats { grid-template-columns: repeat(2, 1fr); }
+            .ara-flow { flex-direction: column; }
+            .ara-flow-step::after { display: none; }
         }
     </style>
 </head>
@@ -812,10 +1177,50 @@
 
             <div class="sidebar-section">
                 <div class="sidebar-title">⚡ Powered by Ara</div>
-                <div style="background: var(--card); border-radius: 12px; padding: 15px; font-size: 0.85rem; color: #888;">
-                    <div style="margin-bottom: 8px;">🔄 Last scan: 2 min ago</div>
-                    <div style="margin-bottom: 8px;">🌐 Sources: JHU Hub, Dept Calendars</div>
-                    <div>⏰ Next scan: 58 min</div>
+                <div class="ara-status" onclick="showAraModal()" style="cursor: pointer;">
+                    <div class="ara-pulse"></div>
+                    <div style="background: var(--card); border-radius: 12px; padding: 15px; font-size: 0.85rem; color: #888; position: relative;">
+                        <div style="position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite;"></div>
+                        <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--success);">●</span> Agent Running
+                        </div>
+                        <div style="margin-bottom: 8px;">🔄 Last scan: <span id="lastScan">2 min ago</span></div>
+                        <div style="margin-bottom: 8px;">🌐 6 sources connected</div>
+                        <div style="margin-bottom: 12px;">⏰ Next scan: <span id="nextScan">58 min</span></div>
+                        <div style="background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #000; padding: 8px 12px; border-radius: 8px; text-align: center; font-weight: 600;">
+                            🔍 View Ara Dashboard →
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">🔗 Connected Sources</div>
+                <div class="sources-list">
+                    <div class="source-item connected">
+                        <span>🌐</span> JHU Hub Events
+                        <span class="source-status">✓</span>
+                    </div>
+                    <div class="source-item connected">
+                        <span>📧</span> Outlook Calendar
+                        <span class="source-status">✓</span>
+                    </div>
+                    <div class="source-item connected">
+                        <span>📸</span> Instagram @jhuhopkins
+                        <span class="source-status">✓</span>
+                    </div>
+                    <div class="source-item connected">
+                        <span>💬</span> GroupMe (CS Class)
+                        <span class="source-status">✓</span>
+                    </div>
+                    <div class="source-item connected">
+                        <span>📱</span> Telegram Alerts
+                        <span class="source-status">✓</span>
+                    </div>
+                    <div class="source-item" onclick="showAraModal()">
+                        <span>➕</span> Add Source...
+                        <span class="source-status add">+</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -934,6 +1339,346 @@
 
     <!-- Toast -->
     <div class="toast" id="toast">🎉 Review submitted! +10 XP</div>
+
+    <!-- Ara Dashboard Modal -->
+    <div class="modal-overlay" id="araModal">
+        <div class="modal ara-modal">
+            <div class="ara-header">
+                <div class="ara-logo">⚡</div>
+                <div class="ara-title-block">
+                    <h2>Powered by Ara</h2>
+                    <p>Your AI computer that runs 24/7 in the cloud</p>
+                </div>
+            </div>
+
+            <div class="ara-tabs">
+                <div class="ara-tab active" onclick="showAraTab('overview')">Overview</div>
+                <div class="ara-tab" onclick="showAraTab('live')">Live Scan</div>
+                <div class="ara-tab" onclick="showAraTab('connectors')">Connectors</div>
+                <div class="ara-tab" onclick="showAraTab('code')">Code</div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div class="ara-tab-content" id="araOverview">
+                <div class="ara-stats">
+                    <div class="ara-stat">
+                        <div class="ara-stat-value">847</div>
+                        <div class="ara-stat-label">Events Scanned</div>
+                    </div>
+                    <div class="ara-stat">
+                        <div class="ara-stat-value">156</div>
+                        <div class="ara-stat-label">Food Found</div>
+                    </div>
+                    <div class="ara-stat">
+                        <div class="ara-stat-value">24/7</div>
+                        <div class="ara-stat-label">Always Running</div>
+                    </div>
+                    <div class="ara-stat">
+                        <div class="ara-stat-value">6</div>
+                        <div class="ara-stat-label">Sources</div>
+                    </div>
+                </div>
+
+                <div class="ara-section">
+                    <div class="ara-section-title">🔄 How Ara Works</div>
+                    <div class="ara-architecture">
+                        <div class="ara-flow">
+                            <div class="ara-flow-step">
+                                <div class="ara-flow-icon">📅</div>
+                                <div class="ara-flow-label">SCAN</div>
+                                <div class="ara-flow-desc">Ara browses event pages every hour</div>
+                            </div>
+                            <div class="ara-flow-step">
+                                <div class="ara-flow-icon">🤖</div>
+                                <div class="ara-flow-label">DETECT</div>
+                                <div class="ara-flow-desc">AI finds "free pizza" signals</div>
+                            </div>
+                            <div class="ara-flow-step">
+                                <div class="ara-flow-icon">📍</div>
+                                <div class="ara-flow-label">MAP</div>
+                                <div class="ara-flow-desc">Places events on campus map</div>
+                            </div>
+                            <div class="ara-flow-step">
+                                <div class="ara-flow-icon">🔔</div>
+                                <div class="ara-flow-label">ALERT</div>
+                                <div class="ara-flow-desc">Sends notifications to you</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ara-section">
+                    <div class="ara-section-title">💻 Deploy in One Command</div>
+                    <div class="ara-terminal">
+                        <div class="ara-terminal-header">
+                            <div class="ara-terminal-dot red"></div>
+                            <div class="ara-terminal-dot yellow"></div>
+                            <div class="ara-terminal-dot green"></div>
+                            <div class="ara-terminal-title">Terminal</div>
+                        </div>
+                        <div class="ara-terminal-body">
+                            <div class="ara-terminal-line">
+                                <span class="comment"># Install Ara SDK</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="prompt">$</span> <span class="cmd">pip install ara-sdk</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="output">Successfully installed ara-sdk-0.1.0</span>
+                            </div>
+                            <div class="ara-terminal-line"><br></div>
+                            <div class="ara-terminal-line">
+                                <span class="comment"># Login to Ara</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="prompt">$</span> <span class="cmd">ara auth login</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="success">✓ Logged in as leo.z@jhu.edu</span>
+                            </div>
+                            <div class="ara-terminal-line"><br></div>
+                            <div class="ara-terminal-line">
+                                <span class="comment"># Deploy to run every hour</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="prompt">$</span> <span class="cmd">ara deploy freefood.py --cron "0 * * * *"</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="success">✓ Deployed! Running at https://app.ara.so/freefood</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Scan Tab -->
+            <div class="ara-tab-content" id="araLive" style="display: none;">
+                <div class="ara-live-scan">
+                    <div class="ara-scan-header">
+                        <div class="ara-scan-status">
+                            <div class="ara-scan-dot"></div>
+                            <span>Live Scan Running</span>
+                        </div>
+                        <button onclick="runAraScan()" style="background: var(--success); border: none; padding: 8px 16px; border-radius: 8px; color: #000; font-weight: 600; cursor: pointer;">
+                            ▶ Run Now
+                        </button>
+                    </div>
+                    <div class="ara-scan-log" id="araScanLog">
+                        <div class="ara-scan-line" style="color: var(--info);">[12:00:01] Starting hourly scan...</div>
+                        <div class="ara-scan-line" style="color: #888;">[12:00:02] Browsing: hub.jhu.edu/events</div>
+                        <div class="ara-scan-line" style="color: #888;">[12:00:05] Found 23 events on JHU Hub</div>
+                        <div class="ara-scan-line" style="color: #888;">[12:00:06] Analyzing event descriptions...</div>
+                        <div class="ara-scan-line" style="color: var(--secondary);">[12:00:08] 🍕 DETECTED: "Game Showcase" - Free pizza mentioned</div>
+                        <div class="ara-scan-line" style="color: #888;">[12:00:09] Browsing: cs.jhu.edu/events</div>
+                        <div class="ara-scan-line" style="color: var(--secondary);">[12:00:12] 🌮 DETECTED: "ACM Meeting" - Chipotle catering</div>
+                        <div class="ara-scan-line" style="color: #888;">[12:00:13] Checking Instagram @jhuhopkins...</div>
+                        <div class="ara-scan-line" style="color: #888;">[12:00:15] Scanning Outlook calendar invites...</div>
+                        <div class="ara-scan-line" style="color: var(--secondary);">[12:00:17] 🥗 DETECTED: "Research Symposium" - Catered lunch</div>
+                        <div class="ara-scan-line" style="color: var(--success);">[12:00:20] ✓ Scan complete! Found 6 free food events</div>
+                        <div class="ara-scan-line" style="color: var(--info);">[12:00:21] Sending Telegram notification...</div>
+                        <div class="ara-scan-line" style="color: var(--success);">[12:00:22] ✓ Alert sent to 47 subscribers</div>
+                    </div>
+                </div>
+
+                <div class="ara-section">
+                    <div class="ara-section-title">📊 Detection Examples</div>
+                    <div style="background: var(--card); border-radius: 12px; padding: 20px;">
+                        <div style="margin-bottom: 15px; padding: 15px; background: rgba(0,255,136,0.1); border-left: 3px solid var(--success); border-radius: 0 8px 8px 0;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">Input: Event Description</div>
+                            <div style="color: #aaa; font-size: 0.9rem;">"Join us for a talk on machine learning. <span style="color: var(--secondary); font-weight: 600;">Pizza will be provided</span> after the presentation."</div>
+                        </div>
+                        <div style="padding: 15px; background: rgba(254,202,87,0.1); border-left: 3px solid var(--secondary); border-radius: 0 8px 8px 0;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">AI Detection</div>
+                            <div style="color: #aaa; font-size: 0.9rem;">
+                                <span style="color: var(--success);">✓ Food Signal:</span> "Pizza will be provided"<br>
+                                <span style="color: var(--success);">✓ Confidence:</span> 95%<br>
+                                <span style="color: var(--success);">✓ Food Type:</span> Pizza
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connectors Tab -->
+            <div class="ara-tab-content" id="araConnectors" style="display: none;">
+                <div class="ara-section">
+                    <div class="ara-section-title">🔗 Connected Data Sources</div>
+                    <p style="color: #888; margin-bottom: 20px;">Ara uses connector tools to access your apps. Click to connect more sources.</p>
+                    <div class="ara-connectors">
+                        <div class="ara-connector connected">
+                            <div class="ara-connector-icon">🌐</div>
+                            <div class="ara-connector-name">Web Browser</div>
+                            <div class="ara-connector-status">✓ Connected</div>
+                        </div>
+                        <div class="ara-connector connected">
+                            <div class="ara-connector-icon">📧</div>
+                            <div class="ara-connector-name">Outlook</div>
+                            <div class="ara-connector-status">✓ Connected</div>
+                        </div>
+                        <div class="ara-connector connected">
+                            <div class="ara-connector-icon">📸</div>
+                            <div class="ara-connector-name">Instagram</div>
+                            <div class="ara-connector-status">✓ Connected</div>
+                        </div>
+                        <div class="ara-connector connected">
+                            <div class="ara-connector-icon">💬</div>
+                            <div class="ara-connector-name">GroupMe</div>
+                            <div class="ara-connector-status">✓ Connected</div>
+                        </div>
+                        <div class="ara-connector connected">
+                            <div class="ara-connector-icon">📱</div>
+                            <div class="ara-connector-name">Telegram</div>
+                            <div class="ara-connector-status">✓ Connected</div>
+                        </div>
+                        <div class="ara-connector" onclick="showToast('🔗 Connect Discord in Ara settings')">
+                            <div class="ara-connector-icon">🎮</div>
+                            <div class="ara-connector-name">Discord</div>
+                            <div class="ara-connector-status">+ Connect</div>
+                        </div>
+                        <div class="ara-connector" onclick="showToast('🔗 Connect WhatsApp in Ara settings')">
+                            <div class="ara-connector-icon">💚</div>
+                            <div class="ara-connector-name">WhatsApp</div>
+                            <div class="ara-connector-status">+ Connect</div>
+                        </div>
+                        <div class="ara-connector" onclick="showToast('🔗 Connect Slack in Ara settings')">
+                            <div class="ara-connector-icon">💼</div>
+                            <div class="ara-connector-name">Slack</div>
+                            <div class="ara-connector-status">+ Connect</div>
+                        </div>
+                        <div class="ara-connector" onclick="showToast('🔗 Connect Google Calendar in Ara settings')">
+                            <div class="ara-connector-icon">📅</div>
+                            <div class="ara-connector-name">Google Calendar</div>
+                            <div class="ara-connector-status">+ Connect</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ara-section">
+                    <div class="ara-section-title">🤖 What Connectors Enable</div>
+                    <div style="background: var(--card); border-radius: 12px; padding: 20px;">
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; gap: 15px; align-items: flex-start;">
+                                <span style="font-size: 1.5rem;">📧</span>
+                                <div>
+                                    <div style="font-weight: 600;">Email Scanning</div>
+                                    <div style="color: #888; font-size: 0.85rem;">Ara reads your Outlook for event invites with food mentions</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 15px; align-items: flex-start;">
+                                <span style="font-size: 1.5rem;">📸</span>
+                                <div>
+                                    <div style="font-weight: 600;">Instagram Monitoring</div>
+                                    <div style="color: #888; font-size: 0.85rem;">Watches @jhuhopkins and department accounts for food posts</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 15px; align-items: flex-start;">
+                                <span style="font-size: 1.5rem;">📱</span>
+                                <div>
+                                    <div style="font-weight: 600;">Instant Alerts</div>
+                                    <div style="color: #888; font-size: 0.85rem;">Sends Telegram/Discord alerts when free food is found</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Code Tab -->
+            <div class="ara-tab-content" id="araCode" style="display: none;">
+                <div class="ara-section">
+                    <div class="ara-section-title">🐍 freefood.py - The Ara Agent</div>
+                    <div class="ara-code">
+<span class="keyword">import</span> ara
+
+<span class="comment"># Define custom tool for food detection</span>
+<span class="decorator">@ara.tool</span>
+<span class="keyword">def</span> <span class="function">detect_food</span>(event_description: <span class="function">str</span>) -> <span class="function">dict</span>:
+    <span class="string">"""Analyze event for free food signals"""</span>
+    food_keywords = [<span class="string">"pizza"</span>, <span class="string">"catering"</span>, <span class="string">"lunch provided"</span>, <span class="string">"free food"</span>]
+    <span class="keyword">for</span> keyword <span class="keyword">in</span> food_keywords:
+        <span class="keyword">if</span> keyword <span class="keyword">in</span> event_description.lower():
+            <span class="keyword">return</span> {<span class="string">"has_food"</span>: <span class="keyword">True</span>, <span class="string">"signal"</span>: keyword}
+    <span class="keyword">return</span> {<span class="string">"has_food"</span>: <span class="keyword">False</span>}
+
+<span class="comment"># Create the Ara agent</span>
+freefood = ara.<span class="function">Automation</span>(
+    id=<span class="string">"freefood-jhu"</span>,
+    system_instructions=<span class="string">"""
+    You are a free food finding agent for JHU students.
+
+    Every hour:
+    1. Browse hub.jhu.edu/events for campus events
+    2. Check CS, ECE, Physics department calendars
+    3. Scan Instagram @jhuhopkins for food posts
+    4. Read connected Outlook calendars for event invites
+
+    For each event, analyze if free food is mentioned.
+    If food is found, extract: event name, location, time, food type.
+
+    Send Telegram alerts for high-confidence food events.
+    """</span>,
+    tools=[detect_food],
+    allow_connector_tools=<span class="keyword">True</span>,  <span class="comment"># Enable web, email, social</span>
+)
+
+<span class="comment"># Run the agent</span>
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    freefood.<span class="function">run</span>()
+                    </div>
+                </div>
+
+                <div class="ara-section">
+                    <div class="ara-section-title">🚀 Deployment Commands</div>
+                    <div class="ara-terminal">
+                        <div class="ara-terminal-header">
+                            <div class="ara-terminal-dot red"></div>
+                            <div class="ara-terminal-dot yellow"></div>
+                            <div class="ara-terminal-dot green"></div>
+                            <div class="ara-terminal-title">Terminal</div>
+                        </div>
+                        <div class="ara-terminal-body">
+                            <div class="ara-terminal-line">
+                                <span class="comment"># Deploy with hourly cron schedule</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="prompt">$</span> <span class="cmd">ara deploy freefood.py --cron "0 * * * *"</span>
+                            </div>
+                            <div class="ara-terminal-line"><br></div>
+                            <div class="ara-terminal-line">
+                                <span class="comment"># Run manually for testing</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="prompt">$</span> <span class="cmd">ara run freefood.py</span>
+                            </div>
+                            <div class="ara-terminal-line"><br></div>
+                            <div class="ara-terminal-line">
+                                <span class="comment"># View logs</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="prompt">$</span> <span class="cmd">ara logs freefood.py --follow</span>
+                            </div>
+                            <div class="ara-terminal-line"><br></div>
+                            <div class="ara-terminal-line">
+                                <span class="comment"># Connect Instagram in Ara app</span>
+                            </div>
+                            <div class="ara-terminal-line">
+                                <span class="prompt">$</span> <span class="cmd">ara connectors add instagram</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; gap: 15px;">
+                <a href="https://ara.so" target="_blank" style="flex: 1; background: linear-gradient(90deg, #6366f1, #8b5cf6); padding: 15px; border-radius: 12px; text-align: center; color: white; text-decoration: none; font-weight: 600;">
+                    🌐 Visit ara.so
+                </a>
+                <a href="https://github.com/anthropics/anthropic-cookbook/tree/main/misc/ara" target="_blank" style="flex: 1; background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; text-align: center; color: white; text-decoration: none; font-weight: 600;">
+                    📚 View Docs
+                </a>
+            </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -1222,6 +1967,75 @@
 
         // Initialize
         renderEvents();
+
+        // Ara Modal Functions
+        function showAraModal() {
+            document.getElementById('araModal').classList.add('show');
+        }
+
+        function showAraTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.ara-tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.ara-tab').forEach(t => t.classList.remove('active'));
+
+            // Show selected tab
+            const tabId = 'ara' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+            document.getElementById(tabId).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        function runAraScan() {
+            const log = document.getElementById('araScanLog');
+            log.innerHTML = '';
+
+            const scanSteps = [
+                { time: '00:00', msg: 'Starting live scan...', color: 'var(--info)' },
+                { time: '00:01', msg: 'Connecting to Ara cloud agent...', color: '#888' },
+                { time: '00:02', msg: '✓ Agent connected (freefood-jhu)', color: 'var(--success)' },
+                { time: '00:03', msg: 'Browsing: hub.jhu.edu/events', color: '#888' },
+                { time: '00:05', msg: 'Parsing 47 events from JHU Hub...', color: '#888' },
+                { time: '00:07', msg: '🍕 DETECTED: "Game Showcase" - Pizza confirmed', color: 'var(--secondary)' },
+                { time: '00:08', msg: 'Browsing: cs.jhu.edu/events', color: '#888' },
+                { time: '00:10', msg: '🌮 DETECTED: "ACM Meeting" - Chipotle mentioned', color: 'var(--secondary)' },
+                { time: '00:11', msg: 'Checking Instagram @jhuhopkins...', color: '#888' },
+                { time: '00:13', msg: 'Reading Outlook calendar invites...', color: '#888' },
+                { time: '00:15', msg: '🥗 DETECTED: "Research Symposium" - Catered lunch', color: 'var(--secondary)' },
+                { time: '00:16', msg: 'Browsing: physics.jhu.edu/colloquium', color: '#888' },
+                { time: '00:17', msg: '🍪 DETECTED: "Physics Colloquium" - Refreshments', color: 'var(--secondary)' },
+                { time: '00:18', msg: '✓ Scan complete! Found 6 food events', color: 'var(--success)' },
+                { time: '00:19', msg: 'Sending Telegram notification...', color: 'var(--info)' },
+                { time: '00:20', msg: '✓ Alerts sent to 47 subscribers!', color: 'var(--success)' },
+            ];
+
+            scanSteps.forEach((step, i) => {
+                setTimeout(() => {
+                    const line = document.createElement('div');
+                    line.className = 'ara-scan-line';
+                    line.style.color = step.color;
+                    line.style.animationDelay = '0s';
+                    line.textContent = `[${step.time}] ${step.msg}`;
+                    log.appendChild(line);
+                    log.scrollTop = log.scrollHeight;
+                }, i * 300);
+            });
+        }
+
+        // Update scan timers
+        function updateScanTimers() {
+            const now = new Date();
+            const mins = now.getMinutes();
+            const lastScan = mins;
+            const nextScan = 60 - mins;
+
+            const lastScanEl = document.getElementById('lastScan');
+            const nextScanEl = document.getElementById('nextScan');
+
+            if (lastScanEl) lastScanEl.textContent = lastScan + ' min ago';
+            if (nextScanEl) nextScanEl.textContent = nextScan + ' min';
+        }
+
+        setInterval(updateScanTimers, 60000);
+        updateScanTimers();
 
         // Close modals on overlay click
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
