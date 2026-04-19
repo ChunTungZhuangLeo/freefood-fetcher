@@ -1362,11 +1362,11 @@
             <div class="ara-tab-content" id="araOverview">
                 <div class="ara-stats">
                     <div class="ara-stat">
-                        <div class="ara-stat-value">847</div>
+                        <div class="ara-stat-value" id="araStatScanned">--</div>
                         <div class="ara-stat-label">Events Scanned</div>
                     </div>
                     <div class="ara-stat">
-                        <div class="ara-stat-value">156</div>
+                        <div class="ara-stat-value" id="araStatFood">--</div>
                         <div class="ara-stat-label">Food Found</div>
                     </div>
                     <div class="ara-stat">
@@ -1374,9 +1374,21 @@
                         <div class="ara-stat-label">Always Running</div>
                     </div>
                     <div class="ara-stat">
-                        <div class="ara-stat-value">6</div>
+                        <div class="ara-stat-value" id="araStatSources">--</div>
                         <div class="ara-stat-label">Sources</div>
                     </div>
+                </div>
+
+                <div id="araDataStatus" style="background: rgba(255,107,107,0.1); border: 1px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 20px; display: none;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">⏳ No real data yet</div>
+                    <div style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">Run <code style="background: var(--card); padding: 2px 6px; border-radius: 4px;">ara run freefood_live.py</code> then paste the JSON below:</div>
+                    <textarea id="araJsonInput" placeholder='Paste Ara JSON output here...' style="width: 100%; height: 80px; background: #0d0d0d; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 10px; font-family: monospace; font-size: 0.8rem; resize: vertical;"></textarea>
+                    <button onclick="loadPastedData()" style="margin-top: 10px; background: var(--success); border: none; padding: 10px 20px; border-radius: 8px; color: #000; font-weight: 600; cursor: pointer; width: 100%;">Load Real Data</button>
+                </div>
+
+                <div id="araRealDataBadge" style="background: rgba(0,255,136,0.1); border: 1px solid var(--success); border-radius: 12px; padding: 15px; margin-bottom: 20px; display: none;">
+                    <div style="font-weight: 600; color: var(--success);">✓ Showing REAL data from Ara</div>
+                    <div style="color: #888; font-size: 0.85rem;">Last scan: <span id="lastRealScan">--</span></div>
                 </div>
 
                 <div class="ara-section">
@@ -1806,12 +1818,14 @@ freefood = ara.<span class="function">Automation</span>(
                     badgeText = '🔥 Now';
                 }
 
+                const realBadge = event.isReal ? '<span class="event-badge" style="background: rgba(0,255,136,0.3); color: var(--success); margin-left: 5px;">✓ REAL</span>' : '';
+
                 card.innerHTML = `
                     <div class="event-header">
                         <div class="event-title">
                             ${event.title}
                         </div>
-                        <span class="event-badge ${badgeClass}">${badgeText}</span>
+                        <div>${realBadge}<span class="event-badge ${badgeClass}">${badgeText}</span></div>
                     </div>
                     <div class="event-meta">
                         <span>📍 ${event.location}</span>
@@ -1965,7 +1979,122 @@ freefood = ara.<span class="function">Automation</span>(
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        // Load real Ara data
+        let araData = null;
+
+        async function loadAraData() {
+            try {
+                const response = await fetch('../data/events.json');
+                araData = await response.json();
+                updateAraDisplay();
+            } catch (e) {
+                console.log('No ara data yet:', e);
+                document.getElementById('araDataStatus').style.display = 'block';
+            }
+        }
+
+        function updateAraDisplay() {
+            if (!araData) return;
+
+            // Update stats
+            document.getElementById('araStatScanned').textContent = araData.total_scanned || 0;
+            document.getElementById('araStatFood').textContent = araData.food_found || 0;
+            document.getElementById('araStatSources').textContent = araData.source_urls?.length || 0;
+
+            // Show/hide status message
+            if (araData.status === 'awaiting_scan' || araData.events?.length === 0) {
+                document.getElementById('araDataStatus').style.display = 'block';
+            } else {
+                document.getElementById('araDataStatus').style.display = 'none';
+
+                // Update events list with real data
+                if (araData.events && araData.events.length > 0) {
+                    // Merge real events into our events array
+                    araData.events.forEach((realEvent, idx) => {
+                        if (!events.find(e => e.title === realEvent.title)) {
+                            events.unshift({
+                                id: 100 + idx,
+                                title: realEvent.title,
+                                location: realEvent.location,
+                                coords: getLocationCoords(realEvent.location),
+                                time: realEvent.time,
+                                food: realEvent.food,
+                                score: realEvent.confidence,
+                                rating: 0,
+                                reviews: 0,
+                                isPublic: realEvent.isPublic !== false,
+                                isHot: realEvent.confidence >= 90,
+                                photos: ['🍕'],
+                                tags: realEvent.signals?.map(s => s) || [],
+                                isReal: true
+                            });
+                        }
+                    });
+                    renderEvents();
+                }
+            }
+
+            // Update scan log with real data
+            if (araData.scan_time) {
+                const scanTime = new Date(araData.scan_time);
+                const log = document.getElementById('araScanLog');
+                log.innerHTML = `
+                    <div class="ara-scan-line" style="color: var(--info);">[${scanTime.toLocaleTimeString()}] Ara scan completed</div>
+                    ${araData.source_urls?.map(url => `<div class="ara-scan-line" style="color: #888;">Browsed: ${url}</div>`).join('') || ''}
+                    <div class="ara-scan-line" style="color: var(--success);">✓ Scanned ${araData.total_scanned} events, found ${araData.food_found} with food</div>
+                    ${araData.events?.map(e => `<div class="ara-scan-line" style="color: var(--secondary);">🍕 FOUND: "${e.title}" - ${e.food}</div>`).join('') || ''}
+                `;
+            }
+        }
+
+        function loadPastedData() {
+            const input = document.getElementById('araJsonInput').value;
+            try {
+                // Try to extract JSON from the input (might have extra text around it)
+                let jsonStr = input;
+                const jsonMatch = input.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    jsonStr = jsonMatch[0];
+                }
+
+                araData = JSON.parse(jsonStr);
+                araData.status = 'loaded';
+                updateAraDisplay();
+
+                // Show success badge
+                document.getElementById('araDataStatus').style.display = 'none';
+                document.getElementById('araRealDataBadge').style.display = 'block';
+                document.getElementById('lastRealScan').textContent = new Date(araData.scan_time).toLocaleString();
+
+                showToast('✓ Real Ara data loaded! Check the map.');
+            } catch (e) {
+                showToast('Error parsing JSON: ' + e.message);
+                console.error(e);
+            }
+        }
+
+        function getLocationCoords(location) {
+            // Map location names to coordinates
+            const coords = {
+                'hodson': [39.3277, -76.6217],
+                'malone': [39.3269, -76.6211],
+                'hackerman': [39.3264, -76.6205],
+                'bloomberg': [39.3295, -76.6223],
+                'glass pavilion': [39.3301, -76.6198],
+                'levering': [39.3285, -76.6195],
+                'krieger': [39.3290, -76.6230],
+                'default': [39.3285, -76.6205]
+            };
+
+            const loc = location?.toLowerCase() || '';
+            for (const [key, coord] of Object.entries(coords)) {
+                if (loc.includes(key)) return coord;
+            }
+            return coords.default;
+        }
+
         // Initialize
+        loadAraData();
         renderEvents();
 
         // Ara Modal Functions

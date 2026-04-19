@@ -1,0 +1,13 @@
+{
+  "scan_time": "2024-04-19T12:00:00Z",
+  "source_urls": [
+    "https://hub.jhu.edu/events/",
+    "https://studentaffairs.jhu.edu/calendar/",
+    "https://www.cs.jhu.edu/news-events/"
+  ],
+  "events": [],
+  "total_scanned": 0,
+  "food_found": 0,
+  "status": "awaiting_scan",
+  "message": "Run 'ara run freefood_live.py' to fetch real events"
+}

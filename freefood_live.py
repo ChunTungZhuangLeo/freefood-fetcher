@@ -89,20 +89,35 @@ When run, you MUST:
 
 ## OUTPUT FORMAT
 
-Give me a clear report like:
+Output your findings as JSON so it can be loaded into our dashboard:
 
-🍕 FREE FOOD FOUND AT JHU 🍕
+```json
+{
+  "scan_time": "2024-04-19T12:00:00Z",
+  "source_urls": ["list of URLs you browsed"],
+  "events": [
+    {
+      "id": 1,
+      "title": "Event Name",
+      "location": "Building Name",
+      "time": "Today 6:00 PM",
+      "food": "What food is available",
+      "confidence": 95,
+      "source": "hub.jhu.edu",
+      "isPublic": true,
+      "signals": ["free pizza", "catered"]
+    }
+  ],
+  "total_scanned": 25,
+  "food_found": 3
+}
+```
 
-HIGH CONFIDENCE (80%+):
-1. [Event Name] - [Location] - [Time]
-   Food: "[what food]"
-
-MAYBE FOOD (50-79%):
-1. [Event Name] - [Location] - [Time]
-   Signal: "[why you think food]"
-
-If you cannot access a URL, say so. If no events found, say so.
-Be real. Don't make up events.
+IMPORTANT:
+- Only include events you ACTUALLY found on the websites
+- Don't make up events - be real
+- If you cannot access a URL, include it in an "errors" array
+- confidence should be 0-100 based on food signals found
 """,
     tools=[
         get_current_time,
