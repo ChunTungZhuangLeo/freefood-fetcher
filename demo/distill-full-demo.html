@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distill - Full Screen Tracking Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #08080c;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            color: #888;
+        }
+
+        /* Main Layout */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            height: calc(100vh - 90px);
+        }
+
+        /* Timeline Panel */
+        .timeline-panel {
+            padding: 30px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .timeline-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #22c55e;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Screenshot Cards */
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .screenshot-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .screenshot-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .screenshot-card:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .screenshot-preview {
+            height: 160px;
+            background: #12121a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screenshot-placeholder {
+            font-size: 3rem;
+            opacity: 0.3;
+        }
+
+        .screenshot-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .screenshot-info {
+            padding: 15px;
+        }
+
+        .screenshot-time {
+            font-size: 0.8rem;
+            color: #8b5cf6;
+            margin-bottom: 5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .screenshot-app {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .screenshot-task {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* Side Panel */
+        .side-panel {
+            background: rgba(255,255,255,0.02);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-section {
+            padding: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* App Usage */
+        .app-usage {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .app-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-bar-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-bar-info {
+            flex: 1;
+        }
+
+        .app-bar-name {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .app-bar-track {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .app-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .app-bar-time {
+            font-size: 0.8rem;
+            color: #888;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* Incomplete Work */
+        .incomplete-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .incomplete-item {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .incomplete-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .incomplete-desc {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        /* Control Button */
+        .control-section {
+            padding: 25px;
+            margin-top: auto;
+        }
+
+        .control-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .control-btn.start {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .control-btn.stop {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .control-btn.extend {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Morning Report Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #1a1a2e;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .modal-stat {
+            text-align: center;
+        }
+
+        .modal-stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
+        .modal-stat-label {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .modal-content {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .modal-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .modal-item:last-child {
+            border-bottom: none;
+        }
+
+        .modal-item-icon {
+            font-size: 1.2rem;
+        }
+
+        .modal-item-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .modal-close {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Phase Indicator */
+        .phase-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .phase {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .phase.active {
+            color: #8b5cf6;
+        }
+
+        .phase.complete {
+            color: #22c55e;
+        }
+
+        .phase-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🌙</div>
+            <span>Distill</span>
+        </div>
+        <div class="time-display" id="currentTime">--:--:--</div>
+    </header>
+
+    <div class="phase-indicator">
+        <div class="phase" id="phase1">
+            <span class="phase-dot"></span>
+            <span>Tracking</span>
+        </div>
+        <div class="phase" id="phase2">
+            <span class="phase-dot"></span>
+            <span>Analyzing</span>
+        </div>
+        <div class="phase" id="phase3">
+            <span class="phase-dot"></span>
+            <span>Extending</span>
+        </div>
+        <div class="phase" id="phase4">
+            <span class="phase-dot"></span>
+            <span>Complete</span>
+        </div>
+    </div>
+
+    <main class="main">
+        <div class="timeline-panel">
+            <div class="timeline-header">
+                <div class="timeline-title">📸 Screen Captures</div>
+                <div class="timeline-status" id="trackingStatus" style="display: none;">
+                    <span class="status-dot"></span>
+                    <span>Tracking</span>
+                </div>
+            </div>
+            <div class="screenshot-grid" id="screenshotGrid">
+                <!-- Screenshots will appear here -->
+            </div>
+        </div>
+
+        <aside class="side-panel">
+            <div class="panel-section">
+                <div class="section-title">Session Stats</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="captureCount">0</div>
+                        <div class="stat-label">Captures</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="sessionDuration">0m</div>
+                        <div class="stat-label">Duration</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="appCount">0</div>
+                        <div class="stat-label">Apps</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="incompleteCount">0</div>
+                        <div class="stat-label">Incomplete</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">App Usage</div>
+                <div class="app-usage" id="appUsage">
+                    <!-- App bars will appear here -->
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">⚠️ Incomplete Work</div>
+                <div class="incomplete-list" id="incompleteList">
+                    <div style="color: #666; font-size: 0.9rem;">
+                        Start tracking to detect incomplete work...
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <button class="control-btn start" id="controlBtn" onclick="handleControl()">
+                    ▶️ Start Tracking
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Morning Report Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">☀️ Morning Report</div>
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="modal-stat-value" id="modalWords">0</div>
+                    <div class="modal-stat-label">words added</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-value" id="modalSections">0</div>
+                    <div class="modal-stat-label">items extended</div>
+                </div>
+            </div>
+            <div class="modal-content">
+                <div class="modal-item">
+                    <span class="modal-item-icon">📄</span>
+                    <span class="modal-item-text"><strong>README.md</strong> - Added Technical Architecture section (+847 words)</span>
+                </div>
+                <div class="modal-item">
+                    <span class="modal-item-icon">💻</span>
+                    <span class="modal-item-text"><strong>api_client.py</strong> - Added docstrings and error handling (+124 lines)</span>
+                </div>
+                <div class="modal-item">
+                    <span class="modal-item-icon">📊</span>
+                    <span class="modal-item-text"><strong>pitch.md</strong> - Completed outline for slides 5-8</span>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeModal()">Review Changes</button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let state = 'idle'; // idle, tracking, analyzing, extending, complete
+        let captures = [];
+        let startTime = null;
+        let captureInterval = null;
+
+        // Simulated data
+        const simulatedCaptures = [
+            { time: '09:15', app: 'VS Code', icon: '💻', task: 'Editing run_distill.py', color: '#007acc' },
+            { time: '09:23', app: 'Chrome', icon: '🌐', task: 'Researching Claude Vision API', color: '#4285f4' },
+            { time: '09:31', app: 'VS Code', icon: '💻', task: 'Writing screen_tracker.py', color: '#007acc' },
+            { time: '09:45', app: 'Terminal', icon: '⬛', task: 'Running pytest', color: '#333' },
+            { time: '09:52', app: 'Notion', icon: '📝', task: 'Updating project notes', color: '#000' },
+            { time: '10:08', app: 'VS Code', icon: '💻', task: 'Debugging API integration', color: '#007acc' },
+            { time: '10:15', app: 'Slack', icon: '💬', task: 'Team discussion', color: '#4a154b' },
+            { time: '10:30', app: 'Chrome', icon: '🌐', task: 'Reading Ara documentation', color: '#4285f4' },
+            { time: '10:45', app: 'VS Code', icon: '💻', task: 'Editing README.md (incomplete)', color: '#007acc' },
+            { time: '11:00', app: 'Figma', icon: '🎨', task: 'Designing demo UI', color: '#f24e1e' },
+            { time: '11:15', app: 'VS Code', icon: '💻', task: 'Writing demo HTML', color: '#007acc' },
+            { time: '11:30', app: 'Chrome', icon: '🌐', task: 'Testing demo page', color: '#4285f4' },
+        ];
+
+        const appUsageData = [
+            { name: 'VS Code', icon: '💻', percentage: 45, time: '2h 45m' },
+            { name: 'Chrome', icon: '🌐', percentage: 25, time: '1h 30m' },
+            { name: 'Terminal', icon: '⬛', percentage: 15, time: '55m' },
+            { name: 'Notion', icon: '📝', percentage: 10, time: '36m' },
+            { name: 'Slack', icon: '💬', percentage: 5, time: '18m' },
+        ];
+
+        const incompleteWork = [
+            { title: 'README.md', desc: 'Missing Architecture section' },
+            { title: 'api_client.py', desc: 'OAuth flow incomplete' },
+            { title: 'Pitch slides', desc: 'Only 4/8 slides done' },
+        ];
+
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent =
+                now.toLocaleTimeString('en-US', { hour12: false });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Handle control button
+        function handleControl() {
+            const btn = document.getElementById('controlBtn');
+
+            if (state === 'idle') {
+                startTracking();
+            } else if (state === 'tracking') {
+                stopTracking();
+            } else if (state === 'analyzing') {
+                // Wait
+            } else if (state === 'extending') {
+                // Wait
+            } else if (state === 'complete') {
+                resetDemo();
+            }
+        }
+
+        function startTracking() {
+            state = 'tracking';
+            startTime = Date.now();
+            captures = [];
+
+            document.getElementById('trackingStatus').style.display = 'flex';
+            document.getElementById('controlBtn').className = 'control-btn stop';
+            document.getElementById('controlBtn').innerHTML = '⏹️ Stop Tracking';
+
+            setPhase(1);
+
+            // Add captures one by one
+            let index = 0;
+            captureInterval = setInterval(() => {
+                if (index < simulatedCaptures.length) {
+                    addCapture(simulatedCaptures[index]);
+                    index++;
+                    updateStats();
+                }
+            }, 800);
+        }
+
+        function stopTracking() {
+            clearInterval(captureInterval);
+            state = 'analyzing';
+
+            document.getElementById('trackingStatus').style.display = 'none';
+            document.getElementById('controlBtn').className = 'control-btn extend';
+            document.getElementById('controlBtn').innerHTML = '⏳ Analyzing...';
+            document.getElementById('controlBtn').disabled = true;
+
+            setPhase(2);
+
+            // Show app usage
+            setTimeout(showAppUsage, 1000);
+
+            // Show incomplete work
+            setTimeout(showIncompleteWork, 2000);
+
+            // Enable extend button
+            setTimeout(() => {
+                state = 'extending';
+                document.getElementById('controlBtn').disabled = false;
+                document.getElementById('controlBtn').innerHTML = '🌙 Run Overnight Extension';
+                setPhase(3);
+            }, 3000);
+        }
+
+        function addCapture(data) {
+            captures.push(data);
+
+            const grid = document.getElementById('screenshotGrid');
+            const card = document.createElement('div');
+            card.className = 'screenshot-card';
+            card.innerHTML = `
+                <div class="screenshot-preview">
+                    <div class="screenshot-overlay">
+                        <div class="app-icon">${data.icon}</div>
+                    </div>
+                </div>
+                <div class="screenshot-info">
+                    <div class="screenshot-time">${data.time}</div>
+                    <div class="screenshot-app">${data.app}</div>
+                    <div class="screenshot-task">${data.task}</div>
+                </div>
+            `;
+
+            grid.insertBefore(card, grid.firstChild);
+
+            // Animate in
+            setTimeout(() => card.classList.add('visible'), 50);
+        }
+
+        function updateStats() {
+            document.getElementById('captureCount').textContent = captures.length;
+
+            const minutes = Math.floor((Date.now() - startTime) / 60000);
+            document.getElementById('sessionDuration').textContent = `${minutes}m`;
+
+            const apps = new Set(captures.map(c => c.app));
+            document.getElementById('appCount').textContent = apps.size;
+        }
+
+        function showAppUsage() {
+            const container = document.getElementById('appUsage');
+            container.innerHTML = '';
+
+            appUsageData.forEach((app, i) => {
+                const bar = document.createElement('div');
+                bar.className = 'app-bar';
+                bar.innerHTML = `
+                    <div class="app-bar-icon">${app.icon}</div>
+                    <div class="app-bar-info">
+                        <div class="app-bar-name">${app.name}</div>
+                        <div class="app-bar-track">
+                            <div class="app-bar-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="app-bar-time">${app.time}</div>
+                `;
+                container.appendChild(bar);
+
+                // Animate bar fill
+                setTimeout(() => {
+                    bar.querySelector('.app-bar-fill').style.width = app.percentage + '%';
+                }, 100 * i);
+            });
+        }
+
+        function showIncompleteWork() {
+            const container = document.getElementById('incompleteList');
+            container.innerHTML = '';
+
+            incompleteWork.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'incomplete-item';
+                el.innerHTML = `
+                    <div class="incomplete-title">⚠️ ${item.title}</div>
+                    <div class="incomplete-desc">${item.desc}</div>
+                `;
+                container.appendChild(el);
+            });
+
+            document.getElementById('incompleteCount').textContent = incompleteWork.length;
+        }
+
+        function setPhase(num) {
+            for (let i = 1; i <= 4; i++) {
+                const phase = document.getElementById('phase' + i);
+                phase.classList.remove('active', 'complete');
+                if (i < num) phase.classList.add('complete');
+                if (i === num) phase.classList.add('active');
+            }
+        }
+
+        // When "Run Overnight" is clicked
+        document.getElementById('controlBtn').addEventListener('click', function() {
+            if (state === 'extending') {
+                runOvernight();
+            }
+        });
+
+        function runOvernight() {
+            const btn = document.getElementById('controlBtn');
+            btn.innerHTML = '✍️ Extending your work...';
+            btn.disabled = true;
+
+            // Simulate overnight work
+            setTimeout(() => {
+                state = 'complete';
+                setPhase(4);
+
+                // Show modal
+                document.getElementById('modalWords').textContent = '1,247';
+                document.getElementById('modalSections').textContent = '3';
+                document.getElementById('modalOverlay').classList.add('show');
+
+                btn.className = 'control-btn start';
+                btn.innerHTML = '🔄 Run Demo Again';
+                btn.disabled = false;
+            }, 2500);
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
+        function resetDemo() {
+            state = 'idle';
+            captures = [];
+            startTime = null;
+
+            document.getElementById('screenshotGrid').innerHTML = '';
+            document.getElementById('appUsage').innerHTML = '';
+            document.getElementById('incompleteList').innerHTML = `
+                <div style="color: #666; font-size: 0.9rem;">
+                    Start tracking to detect incomplete work...
+                </div>
+            `;
+            document.getElementById('captureCount').textContent = '0';
+            document.getElementById('sessionDuration').textContent = '0m';
+            document.getElementById('appCount').textContent = '0';
+            document.getElementById('incompleteCount').textContent = '0';
+
+            document.getElementById('controlBtn').className = 'control-btn start';
+            document.getElementById('controlBtn').innerHTML = '▶️ Start Tracking';
+
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('phase' + i).classList.remove('active', 'complete');
+            }
+        }
+    </script>
+</body>
+</html>

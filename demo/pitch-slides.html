@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Night Shift - Pitch Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            line-height: 1.1;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, #4a9eff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+        }
+
+        p {
+            font-size: 1.8rem;
+            color: #aaa;
+            max-width: 900px;
+            line-height: 1.5;
+        }
+
+        .big-number {
+            font-size: 8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4a9eff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .emoji-big {
+            font-size: 6rem;
+            margin-bottom: 30px;
+        }
+
+        .timeline {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .timeline-item {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            min-width: 200px;
+        }
+
+        .timeline-time {
+            font-size: 1.2rem;
+            color: #4a9eff;
+            margin-bottom: 10px;
+        }
+
+        .timeline-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .timeline-text {
+            font-size: 1.1rem;
+            color: #888;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-item {
+            padding: 40px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-item h3 {
+            font-size: 1.5rem;
+            margin: 20px 0 10px;
+        }
+
+        .feature-item p {
+            font-size: 1rem;
+            color: #888;
+        }
+
+        .phone-preview {
+            width: 280px;
+            height: 500px;
+            background: #1a1a2e;
+            border-radius: 35px;
+            padding: 10px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            margin: 30px 0;
+        }
+
+        .phone-screen {
+            background: #0f0f1a;
+            border-radius: 28px;
+            height: 100%;
+            padding: 50px 15px 15px;
+            font-size: 0.85rem;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .message-bubble {
+            background: #2a2a3e;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo-slide {
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            color: #4a9eff;
+            margin-bottom: 20px;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 1rem;
+            color: #444;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .controls button {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .controls button:hover {
+            background: rgba(74, 158, 255, 0.2);
+            border-color: #4a9eff;
+        }
+
+        .ara-badge {
+            position: absolute;
+            bottom: 30px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .ara-badge img {
+            height: 24px;
+        }
+
+        .highlight-box {
+            background: rgba(74, 158, 255, 0.1);
+            border: 2px solid #4a9eff;
+            border-radius: 15px;
+            padding: 30px 50px;
+            margin-top: 30px;
+        }
+
+        .vs-comparison {
+            display: flex;
+            gap: 60px;
+            margin-top: 40px;
+            align-items: center;
+        }
+
+        .vs-item {
+            flex: 1;
+            padding: 40px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+        }
+
+        .vs-item.bad {
+            border: 2px solid #ef4444;
+        }
+
+        .vs-item.good {
+            border: 2px solid #22c55e;
+        }
+
+        .vs-divider {
+            font-size: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title -->
+    <div class="slide active" id="slide1">
+        <div class="logo-slide">ARA NIGHT SHIFT</div>
+        <h1>Your AI works<br><span>while you sleep</span></h1>
+        <p>A 24/7 productivity agent for the modern professional</p>
+        <div class="slide-number">1/8</div>
+    </div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide" id="slide2">
+        <div class="emoji-big">😫</div>
+        <h1>Every morning starts with <span>chaos</span></h1>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-icon">📧</div>
+                <div class="big-number" style="font-size: 3rem;">50+</div>
+                <div class="timeline-text">Unread emails</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-icon">📅</div>
+                <div class="big-number" style="font-size: 3rem;">6</div>
+                <div class="timeline-text">Meetings today</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-icon">⏰</div>
+                <div class="big-number" style="font-size: 3rem;">2hr</div>
+                <div class="timeline-text">Lost to triage</div>
+            </div>
+        </div>
+        <div class="slide-number">2/8</div>
+    </div>
+
+    <!-- Slide 3: The Insight -->
+    <div class="slide" id="slide3">
+        <h2>While you sleep...</h2>
+        <h1><span>The world doesn't stop</span></h1>
+        <p style="margin-top: 40px;">Emails pile up. Deadlines approach. Calendars conflict.<br>By morning, you're already behind.</p>
+        <div class="slide-number">3/8</div>
+    </div>
+
+    <!-- Slide 4: The Solution -->
+    <div class="slide" id="slide4">
+        <div class="emoji-big">🌙</div>
+        <h1>Introducing <span>Night Shift</span></h1>
+        <p>An AI agent that works at 3 AM so you don't have to</p>
+        <div class="timeline" style="margin-top: 50px;">
+            <div class="timeline-item">
+                <div class="timeline-time">3:00 AM</div>
+                <div class="timeline-icon">📧</div>
+                <div class="timeline-text">Scans inbox<br>Prioritizes emails</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time">3:05 AM</div>
+                <div class="timeline-icon">📅</div>
+                <div class="timeline-text">Checks calendar<br>Flags conflicts</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time">3:10 AM</div>
+                <div class="timeline-icon">✍️</div>
+                <div class="timeline-text">Drafts replies<br>Ready to send</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-time">7:00 AM</div>
+                <div class="timeline-icon">📱</div>
+                <div class="timeline-text">Delivers briefing<br>You're ready</div>
+            </div>
+        </div>
+        <div class="slide-number">4/8</div>
+    </div>
+
+    <!-- Slide 5: The Delivery -->
+    <div class="slide" id="slide5">
+        <h2>Wake up to this</h2>
+        <div class="phone-preview">
+            <div class="phone-screen">
+                <div class="message-bubble">
+                    ☀️ <b>Good Morning!</b><br><br>
+                    🔴 <b>TOP PRIORITY</b><br>
+                    → Reply to boss (draft ready)<br><br>
+                    📅 <b>TODAY</b><br>
+                    → 3 meetings, no conflicts<br>
+                    → 2hr focus block: 2-4 PM<br><br>
+                    📧 <b>INBOX</b><br>
+                    → 2 urgent, 5 important<br>
+                    → 23 auto-archived<br><br>
+                    <i>Have a great day! 🚀</i>
+                </div>
+            </div>
+        </div>
+        <p style="font-size: 1.3rem;">One message. Complete clarity. Ready to go.</p>
+        <div class="slide-number">5/8</div>
+    </div>
+
+    <!-- Slide 6: Why Ara -->
+    <div class="slide" id="slide6">
+        <h1>Powered by <span>Ara</span></h1>
+        <div class="feature-grid">
+            <div class="feature-item">
+                <div style="font-size: 3rem;">☁️</div>
+                <h3>24/7 Cloud Runtime</h3>
+                <p>Always running, even when your computer is off</p>
+            </div>
+            <div class="feature-item">
+                <div style="font-size: 3rem;">🔒</div>
+                <h3>Isolated Sandbox</h3>
+                <p>Your data stays secure in dedicated environment</p>
+            </div>
+            <div class="feature-item">
+                <div style="font-size: 3rem;">📱</div>
+                <h3>Multi-Channel</h3>
+                <p>Delivers via WhatsApp, Telegram, Discord</p>
+            </div>
+        </div>
+        <div class="highlight-box">
+            <p style="font-size: 1.3rem; color: #fff;">This is the future of personal computing:<br><b>AI that works FOR you, not just WITH you</b></p>
+        </div>
+        <div class="slide-number">6/8</div>
+    </div>
+
+    <!-- Slide 7: Before/After -->
+    <div class="slide" id="slide7">
+        <h2>The Difference</h2>
+        <div class="vs-comparison">
+            <div class="vs-item bad">
+                <div style="font-size: 2rem; margin-bottom: 20px;">😰 Before</div>
+                <p style="font-size: 1.1rem; text-align: left;">
+                    • Wake up overwhelmed<br>
+                    • 2 hours of email triage<br>
+                    • Miss important deadlines<br>
+                    • Constantly reactive
+                </p>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="vs-item good">
+                <div style="font-size: 2rem; margin-bottom: 20px;">😎 After</div>
+                <p style="font-size: 1.1rem; text-align: left;">
+                    • Wake up ready<br>
+                    • Clear priorities<br>
+                    • Draft replies waiting<br>
+                    • Proactive, not reactive
+                </p>
+            </div>
+        </div>
+        <div class="slide-number">7/8</div>
+    </div>
+
+    <!-- Slide 8: Closing -->
+    <div class="slide" id="slide8">
+        <div class="logo-slide">NIGHT SHIFT</div>
+        <h1>Wake up <span>ready</span><br>Not overwhelmed</h1>
+        <p style="margin-top: 40px;">We handle the chaos while you rest.</p>
+        <div class="ara-badge">
+            Built at Ara x JHU Hackathon 2025
+        </div>
+        <div class="slide-number">8/8</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button onclick="prevSlide()">← Previous</button>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 8;
+
+        function showSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slide${n}`).classList.add('active');
+            currentSlide = n;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>

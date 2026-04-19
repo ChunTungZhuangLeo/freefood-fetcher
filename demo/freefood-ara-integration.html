@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Food Fetcher - Ara Integration</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.5);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-emoji { font-size: 2.5rem; }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .ara-live {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,217,255,0.1);
+            border: 1px solid rgba(0,217,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+        }
+
+        .ara-live .dot {
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 80px);
+        }
+
+        /* Data Sources Panel */
+        .sources-panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .source-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .source-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .source-card.active {
+            border-color: #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+
+        .source-card.scanning {
+            animation: scanning 1s infinite;
+        }
+
+        @keyframes scanning {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .source-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .source-status {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .source-status.connected {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+        }
+
+        .source-status.pending {
+            background: rgba(254,202,87,0.2);
+            color: #feca57;
+        }
+
+        .source-desc {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .source-data {
+            font-size: 0.8rem;
+            color: #00d9ff;
+        }
+
+        /* Map Panel */
+        .map-panel {
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+
+        .result-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 3px solid #00ff88;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .result-card.medium {
+            border-left-color: #feca57;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .result-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .result-score {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: #00ff88;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .result-score.medium {
+            background: #feca57;
+        }
+
+        .result-details {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .result-source {
+            font-size: 0.75rem;
+            color: #00d9ff;
+            margin-top: 8px;
+        }
+
+        .result-food {
+            background: rgba(0,255,136,0.1);
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #00ff88;
+        }
+
+        /* Phone Notification */
+        .phone-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 320px;
+            background: rgba(30, 30, 50, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            transform: translateY(150%);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+        }
+
+        .phone-notification.show {
+            transform: translateY(0);
+        }
+
+        .notif-header {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notif-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .notif-title {
+            font-weight: 600;
+        }
+
+        .notif-time {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .notif-body {
+            padding: 15px;
+        }
+
+        .notif-event {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .notif-detail {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 3px;
+        }
+
+        .notif-food {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Scan Button */
+        .scan-btn {
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .scan-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Leaflet custom */
+        .leaflet-popup-content-wrapper {
+            background: rgba(20,20,40,0.95);
+            color: white;
+            border-radius: 12px;
+        }
+        .leaflet-popup-tip { background: rgba(20,20,40,0.95); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <span class="logo-emoji">🍕</span>
+            <div class="logo-text">
+                <h1>Free Food Fetcher</h1>
+                <p>Real-time food detection powered by Ara</p>
+            </div>
+        </div>
+        <div class="ara-live">
+            <span class="dot"></span>
+            <span>Running on Ara Cloud</span>
+        </div>
+        <button class="scan-btn" onclick="startScan()">🔍 Scan All Sources</button>
+    </div>
+
+    <div class="main-content">
+        <!-- Data Sources -->
+        <div class="sources-panel">
+            <div class="panel-title">📡 Ara Data Sources</div>
+
+            <div class="source-card" id="source-web">
+                <div class="source-header">
+                    <span class="source-name">🌐 JHU Event Calendars</span>
+                    <span class="source-status connected">Connected</span>
+                </div>
+                <div class="source-desc">Scraping hub.jhu.edu/events, studentaffairs.jhu.edu</div>
+                <div class="source-data">Last scan: <span id="web-time">--</span></div>
+            </div>
+
+            <div class="source-card" id="source-insta">
+                <div class="source-header">
+                    <span class="source-name">📸 Instagram</span>
+                    <span class="source-status connected">Connected</span>
+                </div>
+                <div class="source-desc">@jhuhopkins, @hopkinsstudents, @jhuecs</div>
+                <div class="source-data">Last scan: <span id="insta-time">--</span></div>
+            </div>
+
+            <div class="source-card" id="source-outlook">
+                <div class="source-header">
+                    <span class="source-name">📧 Outlook</span>
+                    <span class="source-status pending">Connect</span>
+                </div>
+                <div class="source-desc">Scan event invitations for food mentions</div>
+                <div class="source-data">Click to connect your account</div>
+            </div>
+
+            <div class="source-card" id="source-calendar">
+                <div class="source-header">
+                    <span class="source-name">📅 Google Calendar</span>
+                    <span class="source-status pending">Connect</span>
+                </div>
+                <div class="source-desc">Check meetings with food in description</div>
+                <div class="source-data">Click to connect your account</div>
+            </div>
+
+            <div class="source-card" id="source-groupme">
+                <div class="source-header">
+                    <span class="source-name">💬 GroupMe</span>
+                    <span class="source-status pending">Connect</span>
+                </div>
+                <div class="source-desc">Monitor group chats for food announcements</div>
+                <div class="source-data">Click to connect</div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0,217,255,0.1); border-radius: 12px; border: 1px solid rgba(0,217,255,0.2);">
+                <div style="font-weight: 600; margin-bottom: 8px;">⚡ Ara Powers</div>
+                <div style="font-size: 0.85rem; color: #888; line-height: 1.5;">
+                    • 24/7 cloud execution<br>
+                    • Hourly automatic scans<br>
+                    • Web scraping<br>
+                    • Multi-channel alerts<br>
+                    • Calendar integration
+                </div>
+            </div>
+        </div>
+
+        <!-- Map -->
+        <div class="map-panel">
+            <div id="map"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-panel">
+            <div class="panel-title">🍕 Food Found (<span id="food-count">0</span>)</div>
+            <div id="results-list"></div>
+        </div>
+    </div>
+
+    <!-- Phone Notification -->
+    <div class="phone-notification" id="phone-notif">
+        <div class="notif-header">
+            <div class="notif-icon">🍕</div>
+            <div>
+                <div class="notif-title">Free Food Alert</div>
+                <div class="notif-time">Just now</div>
+            </div>
+        </div>
+        <div class="notif-body">
+            <div class="notif-event" id="notif-event">Startup Pitch Night</div>
+            <div class="notif-detail">📍 <span id="notif-location">Hodson Hall 210</span></div>
+            <div class="notif-detail">🕐 <span id="notif-time">Today 6:00 PM</span></div>
+            <div class="notif-food">🍕 Free pizza and drinks! (95% confidence)</div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // JHU campus
+        const JHU = [39.3299, -76.6205];
+
+        // Real events with sources
+        const events = [
+            {
+                name: "Startup Pitch Night",
+                location: "Hodson Hall 210",
+                coords: [39.3277, -76.6217],
+                time: "Today 6:00 PM",
+                food: "Free pizza and drinks!",
+                score: 95,
+                source: "JHU Hub Events"
+            },
+            {
+                name: "ACM Club Meeting",
+                location: "Malone Hall 228",
+                coords: [39.3269, -76.6211],
+                time: "Tomorrow 5:00 PM",
+                food: "Chipotle provided!",
+                score: 92,
+                source: "@jhuacm Instagram"
+            },
+            {
+                name: "CS Department Talk",
+                location: "Hackerman Hall B17",
+                coords: [39.3264, -76.6205],
+                time: "Today 3:30 PM",
+                food: "Pizza after the talk",
+                score: 88,
+                source: "CS Department Calendar"
+            },
+            {
+                name: "Research Symposium",
+                location: "Glass Pavilion",
+                coords: [39.3301, -76.6198],
+                time: "Tomorrow 11:00 AM",
+                food: "Catered lunch reception",
+                score: 85,
+                source: "Graduate School Email"
+            },
+            {
+                name: "Study Break",
+                location: "Brody Learning Commons",
+                coords: [39.3282, -76.6191],
+                time: "Tonight 9:00 PM",
+                food: "Snacks and coffee",
+                score: 72,
+                source: "@hopkinsstudents Instagram"
+            },
+            {
+                name: "Wellness Wednesday",
+                location: "Mason Hall",
+                coords: [39.3286, -76.6230],
+                time: "Today 12:30 PM",
+                food: "Healthy snacks",
+                score: 68,
+                source: "Student Affairs Calendar"
+            }
+        ];
+
+        // Initialize map
+        const map = L.map('map').setView(JHU, 16);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap © CARTO'
+        }).addTo(map);
+
+        const markers = [];
+
+        function createMarker(event) {
+            const color = event.score >= 80 ? '#00ff88' : '#feca57';
+            const emoji = event.score >= 80 ? '🍕' : '❓';
+
+            const icon = L.divIcon({
+                html: `<div style="
+                    width: 40px; height: 40px;
+                    background: ${color};
+                    border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 1.3rem;
+                    box-shadow: 0 3px 15px rgba(0,0,0,0.4);
+                    border: 2px solid white;
+                ">${emoji}</div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+
+            const marker = L.marker(event.coords, { icon }).addTo(map);
+            marker.bindPopup(`
+                <div style="padding: 5px;">
+                    <div style="font-weight: 700; margin-bottom: 5px;">${event.name}</div>
+                    <div style="color: #aaa; font-size: 0.85rem;">📍 ${event.location}</div>
+                    <div style="color: #aaa; font-size: 0.85rem;">🕐 ${event.time}</div>
+                    <div style="background: rgba(0,255,136,0.2); color: #00ff88; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem;">
+                        🍽️ ${event.food}<br>
+                        📊 ${event.score}% confidence
+                    </div>
+                    <div style="color: #00d9ff; font-size: 0.75rem; margin-top: 8px;">
+                        Source: ${event.source}
+                    </div>
+                </div>
+            `);
+            return marker;
+        }
+
+        function renderResult(event, index) {
+            const resultsList = document.getElementById('results-list');
+            const card = document.createElement('div');
+            card.className = `result-card ${event.score < 80 ? 'medium' : ''}`;
+            card.innerHTML = `
+                <div class="result-header">
+                    <span class="result-title">${event.name}</span>
+                    <span class="result-score ${event.score < 80 ? 'medium' : ''}">${event.score}%</span>
+                </div>
+                <div class="result-details">📍 ${event.location} • 🕐 ${event.time}</div>
+                <div class="result-source">Source: ${event.source}</div>
+                <div class="result-food">🍽️ "${event.food}"</div>
+            `;
+            card.onclick = () => {
+                map.flyTo(event.coords, 18);
+                markers[index].openPopup();
+            };
+            resultsList.appendChild(card);
+        }
+
+        function showNotification(event) {
+            document.getElementById('notif-event').textContent = event.name;
+            document.getElementById('notif-location').textContent = event.location;
+            document.getElementById('notif-time').textContent = event.time;
+            document.getElementById('phone-notif').classList.add('show');
+
+            setTimeout(() => {
+                document.getElementById('phone-notif').classList.remove('show');
+            }, 5000);
+        }
+
+        function updateSourceTime(id) {
+            const now = new Date().toLocaleTimeString();
+            document.getElementById(id).textContent = now;
+        }
+
+        function startScan() {
+            // Clear
+            markers.forEach(m => map.removeLayer(m));
+            markers.length = 0;
+            document.getElementById('results-list').innerHTML = '';
+            document.getElementById('food-count').textContent = '0';
+
+            // Animate sources
+            const sources = ['source-web', 'source-insta'];
+            sources.forEach((id, i) => {
+                setTimeout(() => {
+                    document.getElementById(id).classList.add('scanning');
+                    setTimeout(() => {
+                        document.getElementById(id).classList.remove('scanning');
+                        document.getElementById(id).classList.add('active');
+                        updateSourceTime(id === 'source-web' ? 'web-time' : 'insta-time');
+                    }, 1000);
+                }, i * 1500);
+            });
+
+            // Add markers and results
+            events.forEach((event, i) => {
+                setTimeout(() => {
+                    markers.push(createMarker(event));
+                    renderResult(event, i);
+                    document.getElementById('food-count').textContent = i + 1;
+
+                    // Show notification for first high-confidence event
+                    if (i === 0) {
+                        setTimeout(() => showNotification(event), 500);
+                    }
+                }, 3000 + i * 500);
+            });
+        }
+
+        // Auto-start
+        setTimeout(startScan, 1000);
+    </script>
+</body>
+</html>

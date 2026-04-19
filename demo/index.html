@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ara Night Shift - Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            background: radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0f 70%);
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234a9eff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .logo {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4a9eff;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, #4a9eff 0%, #a855f7 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            color: #888;
+            max-width: 600px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .cta-button {
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #4a9eff, #a855f7);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(74, 158, 255, 0.3);
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 100px 20px;
+            background: #0d0d14;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+        }
+
+        /* Phone Mockup */
+        .phone-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .phone {
+            width: 320px;
+            height: 650px;
+            background: #1a1a2e;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 25px;
+            background: #0a0a0f;
+            border-radius: 20px;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #0f0f1a;
+            border-radius: 30px;
+            overflow: hidden;
+            padding-top: 40px;
+        }
+
+        .telegram-header {
+            background: #2AABEE;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .telegram-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4a9eff, #a855f7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .telegram-name {
+            font-weight: 600;
+        }
+
+        .telegram-status {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .chat-area {
+            padding: 20px;
+            height: calc(100% - 80px);
+            overflow-y: auto;
+        }
+
+        .message {
+            background: #1e1e2e;
+            padding: 15px;
+            border-radius: 15px;
+            border-top-left-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .message.typing {
+            display: flex;
+            gap: 5px;
+            padding: 20px;
+            width: fit-content;
+        }
+
+        .message.typing span {
+            width: 8px;
+            height: 8px;
+            background: #4a9eff;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .message.typing span:nth-child(1) { animation-delay: -0.32s; }
+        .message.typing span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #666;
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .priority-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .priority-urgent {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .priority-important {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        /* Process Steps */
+        .process {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 400px;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 25px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+        }
+
+        .process-step:hover {
+            background: rgba(74, 158, 255, 0.05);
+            border-color: rgba(74, 158, 255, 0.2);
+        }
+
+        .process-step.active {
+            background: rgba(74, 158, 255, 0.1);
+            border-color: #4a9eff;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4a9eff, #a855f7);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .step-time {
+            font-size: 0.75rem;
+            color: #4a9eff;
+            margin-top: 8px;
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 80px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(74, 158, 255, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #888;
+            line-height: 1.6;
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            padding: 80px 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4a9eff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: #888;
+            margin-top: 10px;
+        }
+
+        /* Footer CTA */
+        .footer-cta {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(180deg, #0d0d14 0%, #1a1a2e 100%);
+        }
+
+        .footer-cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .footer-cta p {
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Built with */
+        .built-with {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .built-with a {
+            color: #4a9eff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="logo">ARA NIGHT SHIFT</div>
+        <h1>Your AI works<br><span>while you sleep</span></h1>
+        <p class="tagline">A 24/7 productivity agent that analyzes your inbox, calendar, and files overnight — then delivers a personalized morning briefing to your phone.</p>
+        <button class="cta-button" onclick="startDemo()">Watch Demo</button>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <div class="container">
+            <h2 class="section-title">See It In Action</h2>
+
+            <div class="phone-container">
+                <!-- Process Steps -->
+                <div class="process">
+                    <div class="process-step" id="step1">
+                        <div class="step-icon">🌙</div>
+                        <div class="step-content">
+                            <h3>You go to sleep</h3>
+                            <p>Night Shift activates at 3:00 AM</p>
+                            <div class="step-time">3:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="process-step" id="step2">
+                        <div class="step-icon">📧</div>
+                        <div class="step-content">
+                            <h3>Email Analysis</h3>
+                            <p>Scans inbox, prioritizes urgent messages</p>
+                            <div class="step-time">3:02 AM</div>
+                        </div>
+                    </div>
+                    <div class="process-step" id="step3">
+                        <div class="step-icon">📅</div>
+                        <div class="step-content">
+                            <h3>Calendar Check</h3>
+                            <p>Finds conflicts, identifies prep needs</p>
+                            <div class="step-time">3:05 AM</div>
+                        </div>
+                    </div>
+                    <div class="process-step" id="step4">
+                        <div class="step-icon">📱</div>
+                        <div class="step-content">
+                            <h3>Briefing Delivered</h3>
+                            <p>Wake up to actionable insights</p>
+                            <div class="step-time">7:00 AM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone Mockup -->
+                <div class="phone">
+                    <div class="phone-screen">
+                        <div class="telegram-header">
+                            <div class="telegram-avatar">🌙</div>
+                            <div>
+                                <div class="telegram-name">Night Shift Agent</div>
+                                <div class="telegram-status">online</div>
+                            </div>
+                        </div>
+                        <div class="chat-area" id="chatArea">
+                            <!-- Messages will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="features">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Runs in isolated cloud sandbox. Your data never leaves the secure environment.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Always Running</h3>
+                    <p>24/7 agent on Ara's cloud infrastructure. Works even when your computer is off.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Actionable Insights</h3>
+                    <p>Not just summaries — draft replies, prioritized tasks, and clear next steps.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+        <div class="stat">
+            <div class="stat-number">2hrs</div>
+            <div class="stat-label">Saved every morning</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Always working for you</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Cloud-based</div>
+        </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <section class="footer-cta">
+        <h2>Ready to reclaim your mornings?</h2>
+        <p>Let Night Shift handle the chaos while you rest.</p>
+        <button class="cta-button" onclick="startDemo()">Try Demo Again</button>
+    </section>
+
+    <div class="built-with">
+        Built at <a href="https://ara.so" target="_blank">Ara</a> x JHU Hackathon 2025 | Powered by Claude AI
+    </div>
+
+    <script>
+        // Demo messages
+        const messages = [
+            {
+                text: `☀️ <b>Good Morning!</b>\n\nIt's Sunday, April 19th\nHere's your morning briefing:`,
+                delay: 500
+            },
+            {
+                text: `<span class="priority-tag priority-urgent">🔴 URGENT</span>\n\n<b>Reply to Professor Chen</b>\nRe: Thesis deadline extension\n→ Draft reply ready ✓\n\n<b>Hackathon starts at 12pm!</b>\n→ Pava Marie LaPere Center\n→ Bring laptop + charger`,
+                delay: 2000
+            },
+            {
+                text: `📅 <b>TODAY'S SCHEDULE</b>\n\n12:00 PM - Hackathon starts\n12:30 PM - Team formation\n6:00 PM - Demo presentations\n\n✅ No conflicts detected\n⏰ 2hr focus block: 2-4 PM`,
+                delay: 2000
+            },
+            {
+                text: `📧 <b>INBOX SUMMARY</b>\n\n<span class="priority-tag priority-urgent">2 Urgent</span> <span class="priority-tag priority-important">5 Important</span>\n\n→ 23 newsletters (auto-archived)\n→ 3 draft replies ready\n→ 1 meeting request (auto-accepted)`,
+                delay: 2000
+            },
+            {
+                text: `✨ <b>SUGGESTED FIRST STEPS</b>\n\n1. Reply to Prof. Chen (30 sec)\n2. Review hackathon ideas doc\n3. Grab coffee ☕\n\n<i>Have a great day! 🚀</i>`,
+                delay: 2000
+            }
+        ];
+
+        let currentStep = 0;
+        let demoRunning = false;
+
+        function startDemo() {
+            if (demoRunning) return;
+            demoRunning = true;
+
+            const chatArea = document.getElementById('chatArea');
+            chatArea.innerHTML = '';
+
+            // Reset steps
+            document.querySelectorAll('.process-step').forEach(step => {
+                step.classList.remove('active');
+            });
+
+            currentStep = 0;
+            showNextMessage();
+        }
+
+        function showNextMessage() {
+            if (currentStep >= messages.length) {
+                demoRunning = false;
+                return;
+            }
+
+            const chatArea = document.getElementById('chatArea');
+            const stepElement = document.getElementById(`step${currentStep + 1}`);
+
+            // Activate step
+            if (stepElement) {
+                document.querySelectorAll('.process-step').forEach(s => s.classList.remove('active'));
+                stepElement.classList.add('active');
+            }
+
+            // Show typing indicator
+            const typing = document.createElement('div');
+            typing.className = 'message typing';
+            typing.innerHTML = '<span></span><span></span><span></span>';
+            chatArea.appendChild(typing);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            // Replace with actual message
+            setTimeout(() => {
+                typing.remove();
+                const msg = document.createElement('div');
+                msg.className = 'message';
+                msg.innerHTML = messages[currentStep].text.replace(/\n/g, '<br>');
+                msg.innerHTML += `<div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
+                chatArea.appendChild(msg);
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+                currentStep++;
+                setTimeout(showNextMessage, messages[currentStep - 1].delay);
+            }, 1500);
+        }
+
+        // Intersection Observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Auto-start demo after a short delay
+        setTimeout(startDemo, 1500);
+    </script>
+</body>
+</html>

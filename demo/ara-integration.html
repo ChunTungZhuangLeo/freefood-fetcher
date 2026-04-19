@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distill on Ara - Live Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #08080c;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ara-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .logo-text span {
+            color: #888;
+            font-weight: 400;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #22c55e;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Layout */
+        .main {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            height: calc(100vh - 81px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255,255,255,0.02);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 20px;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 5px;
+            color: #888;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.15);
+            color: #8b5cf6;
+        }
+
+        /* Content */
+        .content {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .card-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .card-value.purple {
+            color: #8b5cf6;
+        }
+
+        .card-value.green {
+            color: #22c55e;
+        }
+
+        .card-value.blue {
+            color: #3b82f6;
+        }
+
+        /* Activity Log */
+        .activity-section {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .activity-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-title {
+            font-weight: 600;
+        }
+
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s;
+        }
+
+        .activity-item:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(139, 92, 246, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            background: rgba(255,255,255,0.02);
+            border-left: 1px solid rgba(255,255,255,0.08);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Phone Preview */
+        .phone-frame {
+            background: #1a1a2e;
+            border-radius: 30px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .phone-screen {
+            background: #0f0f18;
+            border-radius: 22px;
+            height: 400px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-header {
+            background: #2AABEE;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .phone-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .phone-status {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .phone-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .phone-message {
+            background: #1e1e2e;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border-top-left-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            animation: messageIn 0.3s ease;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        /* Deploy Animation */
+        .deploy-progress {
+            margin-top: 20px;
+        }
+
+        .deploy-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            color: #666;
+        }
+
+        .deploy-step.active {
+            color: #8b5cf6;
+        }
+
+        .deploy-step.complete {
+            color: #22c55e;
+        }
+
+        .deploy-step-icon {
+            width: 24px;
+            height: 24px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .deploy-step.complete .deploy-step-icon {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+
+        /* Terminal */
+        .terminal {
+            background: #0a0a0f;
+            border-radius: 12px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .terminal-line {
+            color: #888;
+        }
+
+        .terminal-line.success {
+            color: #22c55e;
+        }
+
+        .terminal-line.info {
+            color: #3b82f6;
+        }
+
+        .terminal-prompt {
+            color: #8b5cf6;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-group">
+            <div class="ara-logo">A</div>
+            <div class="logo-text">Ara <span>/ distill-agent</span></div>
+        </div>
+        <div class="status-badge">
+            <span class="status-dot"></span>
+            <span id="statusText">Running</span>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">Agent</div>
+                <div class="nav-item active">
+                    <span>📊</span> Dashboard
+                </div>
+                <div class="nav-item">
+                    <span>📸</span> Captures
+                </div>
+                <div class="nav-item">
+                    <span>📄</span> Documents
+                </div>
+                <div class="nav-item">
+                    <span>📝</span> Logs
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Settings</div>
+                <div class="nav-item">
+                    <span>⚙️</span> Configuration
+                </div>
+                <div class="nav-item">
+                    <span>📱</span> Channels
+                </div>
+                <div class="nav-item">
+                    <span>🔑</span> API Keys
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Schedule</div>
+                <div class="nav-item">
+                    <span>🌙</span> Overnight: 3:00 AM
+                </div>
+                <div class="nav-item">
+                    <span>☀️</span> Report: 7:00 AM
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <div class="content">
+            <h1 class="page-title">Agent Dashboard</h1>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-label">Screen Captures</div>
+                    <div class="card-value purple" id="captureCount">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Documents Extended</div>
+                    <div class="card-value green" id="docsExtended">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Words Added</div>
+                    <div class="card-value blue" id="wordsAdded">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Uptime</div>
+                    <div class="card-value" id="uptime">0h 0m</div>
+                </div>
+            </div>
+
+            <div class="activity-section">
+                <div class="activity-header">
+                    <div class="activity-title">Activity Log</div>
+                    <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;">
+                        View All
+                    </button>
+                </div>
+                <div class="activity-list" id="activityList">
+                    <!-- Activities will appear here -->
+                </div>
+            </div>
+
+            <div class="terminal" id="terminal">
+                <div class="terminal-line"><span class="terminal-prompt">$</span> Connecting to Ara platform...</div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <aside class="right-panel">
+            <div class="panel-title">📱 Telegram Preview</div>
+
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="phone-header">
+                        <div class="phone-avatar">🌙</div>
+                        <div>
+                            <div class="phone-name">Distill Agent</div>
+                            <div class="phone-status">online</div>
+                        </div>
+                    </div>
+                    <div class="phone-messages" id="phoneMessages">
+                        <!-- Messages appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-title">Deployment Status</div>
+            <div class="deploy-progress" id="deployProgress">
+                <div class="deploy-step" id="deployStep1">
+                    <div class="deploy-step-icon">1</div>
+                    <span>Connect to Ara</span>
+                </div>
+                <div class="deploy-step" id="deployStep2">
+                    <div class="deploy-step-icon">2</div>
+                    <span>Create Sandbox</span>
+                </div>
+                <div class="deploy-step" id="deployStep3">
+                    <div class="deploy-step-icon">3</div>
+                    <span>Deploy Code</span>
+                </div>
+                <div class="deploy-step" id="deployStep4">
+                    <div class="deploy-step-icon">4</div>
+                    <span>Configure Channels</span>
+                </div>
+                <div class="deploy-step" id="deployStep5">
+                    <div class="deploy-step-icon">5</div>
+                    <span>Schedule Jobs</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="deployBtn" onclick="startDeploy()">
+                    🚀 Deploy to Ara
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        // State
+        let isDeploying = false;
+        let isDeployed = false;
+        let stats = { captures: 0, docs: 0, words: 0, minutes: 0 };
+
+        // Activities
+        const activities = [
+            { icon: '🚀', text: 'Agent initialized on Ara cloud', time: 'Just now' },
+            { icon: '📱', text: 'Telegram channel connected', time: '1 min ago' },
+            { icon: '⚙️', text: 'Overnight schedule configured (3:00 AM)', time: '2 min ago' },
+        ];
+
+        // Initialize
+        function init() {
+            renderActivities();
+        }
+
+        function renderActivities() {
+            const list = document.getElementById('activityList');
+            list.innerHTML = activities.map(a => `
+                <div class="activity-item">
+                    <div class="activity-icon">${a.icon}</div>
+                    <div class="activity-content">
+                        <div class="activity-text">${a.text}</div>
+                        <div class="activity-time">${a.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addActivity(icon, text) {
+            activities.unshift({ icon, text, time: 'Just now' });
+            renderActivities();
+        }
+
+        function terminalLog(text, type = '') {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            line.innerHTML = text;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function addPhoneMessage(text) {
+            const messages = document.getElementById('phoneMessages');
+            const msg = document.createElement('div');
+            msg.className = 'phone-message';
+            msg.innerHTML = text;
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        async function startDeploy() {
+            if (isDeploying || isDeployed) return;
+            isDeploying = true;
+
+            const btn = document.getElementById('deployBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Deploying...';
+
+            // Step 1: Connect
+            await deployStep(1, 'Connecting to api.ara.so...', 1000);
+            terminalLog('<span class="terminal-prompt">$</span> ara connect --region us-east', '');
+            terminalLog('✅ Connected to Ara (us-east-1)', 'success');
+            addActivity('🔌', 'Connected to Ara platform');
+
+            // Step 2: Sandbox
+            await deployStep(2, 'Creating isolated sandbox...', 1500);
+            terminalLog('<span class="terminal-prompt">$</span> ara sandbox create distill-env', '');
+            terminalLog('📦 Sandbox ready: distill-env (Python 3.11)', 'info');
+            addActivity('📦', 'Sandbox environment created');
+
+            // Step 3: Deploy
+            await deployStep(3, 'Uploading agent code...', 2000);
+            terminalLog('<span class="terminal-prompt">$</span> ara deploy ./agents', '');
+            terminalLog('  Uploading distill.py... done', '');
+            terminalLog('  Uploading screen_tracker.py... done', '');
+            terminalLog('  Uploading ara_platform.py... done', '');
+            terminalLog('✅ Deployed 4 files (12.3 KB)', 'success');
+            addActivity('📤', 'Agent code deployed');
+
+            // Step 4: Channels
+            await deployStep(4, 'Configuring channels...', 1500);
+            terminalLog('<span class="terminal-prompt">$</span> ara channels connect telegram', '');
+            terminalLog('✅ Telegram: @DistillBot connected', 'success');
+            addActivity('📱', 'Telegram channel connected');
+
+            // Send first message
+            addPhoneMessage('🌙 <b>Distill Activated!</b><br><br>I\'m now running 24/7 on Ara\'s cloud.');
+
+            // Step 5: Schedule
+            await deployStep(5, 'Setting up schedule...', 1000);
+            terminalLog('<span class="terminal-prompt">$</span> ara schedule overnight 03:00', '');
+            terminalLog('⏰ Scheduled: overnight run at 3:00 AM EST', 'info');
+            terminalLog('⏰ Scheduled: morning report at 7:00 AM EST', 'info');
+            addActivity('🌙', 'Overnight schedule configured');
+
+            // Complete
+            terminalLog('', '');
+            terminalLog('═'.repeat(50), 'success');
+            terminalLog('🎉 DEPLOYMENT COMPLETE', 'success');
+            terminalLog('═'.repeat(50), 'success');
+
+            addPhoneMessage('Tonight at 3:00 AM, I\'ll:<br>• Analyze your screen captures<br>• Extend your documents<br>• Send a morning report at 7:00 AM<br><br>Reply /status anytime! 🚀');
+
+            btn.innerHTML = '✅ Deployed';
+            btn.className = 'btn btn-secondary';
+
+            isDeploying = false;
+            isDeployed = true;
+
+            // Start stats
+            startStats();
+        }
+
+        async function deployStep(num, message, delay) {
+            const step = document.getElementById(`deployStep${num}`);
+            step.classList.add('active');
+            terminalLog(`<span class="terminal-prompt">$</span> ${message}`, '');
+
+            await sleep(delay);
+
+            step.classList.remove('active');
+            step.classList.add('complete');
+            step.querySelector('.deploy-step-icon').innerHTML = '✓';
+        }
+
+        function startStats() {
+            // Simulate stats updating
+            setInterval(() => {
+                stats.captures += Math.floor(Math.random() * 2);
+                stats.minutes++;
+
+                document.getElementById('captureCount').textContent = stats.captures;
+                document.getElementById('uptime').textContent =
+                    `${Math.floor(stats.minutes / 60)}h ${stats.minutes % 60}m`;
+            }, 5000);
+
+            // Simulate overnight run
+            setTimeout(() => {
+                addActivity('🌙', 'Overnight analysis started');
+                addPhoneMessage('🌙 <b>Starting overnight work...</b><br><br>Analyzing 47 screen captures...');
+
+                setTimeout(() => {
+                    stats.docs = 3;
+                    stats.words = 1247;
+                    document.getElementById('docsExtended').textContent = stats.docs;
+                    document.getElementById('wordsAdded').textContent = stats.words.toLocaleString();
+
+                    addActivity('✍️', 'Extended 3 documents (+1,247 words)');
+                    addPhoneMessage('✅ <b>Work complete!</b><br><br>📄 README.md (+847 words)<br>📄 api.py (+124 lines)<br>📄 pitch.md (outline done)<br><br>Ready for your review!');
+                }, 3000);
+            }, 8000);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        init();
+    </script>
+</body>
+</html>

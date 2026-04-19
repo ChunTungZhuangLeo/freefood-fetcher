@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Food Fetcher - Never Miss Free Food</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+        }
+
+        .ara-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        /* Events Panel */
+        .events-panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .scan-btn {
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .scan-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255,107,107,0.4);
+        }
+
+        .scan-btn.scanning {
+            animation: pulse 1s infinite;
+        }
+
+        /* Event Cards */
+        .event-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .event-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .event-card.has-food {
+            border-left: 4px solid #00ff88;
+            background: rgba(0,255,136,0.05);
+        }
+
+        .event-card.no-food {
+            opacity: 0.5;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .event-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .food-badge {
+            background: linear-gradient(90deg, #00ff88, #00d9ff);
+            color: #000;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .event-details {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .event-details span {
+            margin-right: 15px;
+        }
+
+        .food-signal {
+            background: rgba(255,202,87,0.2);
+            color: #feca57;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .food-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .score-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #00ff88);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .score-text {
+            font-weight: 600;
+            color: #00ff88;
+        }
+
+        /* Phone Mockup */
+        .phone-panel {
+            position: sticky;
+            top: 20px;
+        }
+
+        .phone {
+            background: #000;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border: 3px solid #333;
+        }
+
+        .phone-screen {
+            background: linear-gradient(180deg, #1e3c72, #2a5298);
+            border-radius: 30px;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        .phone-header {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .phone-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .phone-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .phone-title {
+            font-weight: 600;
+        }
+
+        .phone-subtitle {
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .phone-messages {
+            padding: 20px;
+            height: 520px;
+            overflow-y: auto;
+        }
+
+        .message {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            animation: slideIn 0.5s ease;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .message.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .message-alert {
+            background: linear-gradient(135deg, rgba(255,107,107,0.2), rgba(254,202,87,0.2));
+            border: 1px solid rgba(255,107,107,0.3);
+        }
+
+        .message-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .message-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Ara Connection */
+        .ara-connection {
+            background: rgba(0,217,255,0.1);
+            border: 1px solid rgba(0,217,255,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .ara-status {
+            width: 12px;
+            height: 12px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .ara-info h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .ara-info p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .ara-info code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .phone-panel {
+                position: static;
+            }
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🍕</div>
+            <h1 class="title">Free Food Fetcher</h1>
+            <p class="subtitle">Never Miss Free Food Again</p>
+            <div class="ara-badge">⚡ Powered by Ara's 24/7 Cloud</div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Events Panel -->
+            <div class="events-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">📍 Campus Events</h2>
+                    <button class="scan-btn" onclick="startScan()">🔍 Scan for Food</button>
+                </div>
+
+                <div id="events-list">
+                    <!-- Events will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Phone Mockup -->
+            <div class="phone-panel">
+                <div class="phone">
+                    <div class="phone-screen">
+                        <div class="phone-header">
+                            <div class="phone-header-left">
+                                <div class="phone-avatar">🍕</div>
+                                <div>
+                                    <div class="phone-title">Free Food Bot</div>
+                                    <div class="phone-subtitle">online</div>
+                                </div>
+                            </div>
+                            <div>📱</div>
+                        </div>
+                        <div class="phone-messages" id="phone-messages">
+                            <!-- Messages will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-events">0</div>
+                <div class="stat-label">Events Scanned</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-food">0</div>
+                <div class="stat-label">Free Food Found</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-alerts">0</div>
+                <div class="stat-label">Alerts Sent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-saved">$0</div>
+                <div class="stat-label">Money Saved</div>
+            </div>
+        </div>
+
+        <!-- Ara Connection -->
+        <div class="ara-connection">
+            <div class="ara-status"></div>
+            <div class="ara-info">
+                <h3>🔗 Connected to Ara Cloud</h3>
+                <p>Agent ID: <code>freefood</code> | Running every hour | Last scan: <span id="last-scan">Just now</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const events = [
+            {
+                id: 1,
+                title: "Tech Talk: Building with AI",
+                location: "Bloomberg Center 462",
+                time: "Today 12:00 PM",
+                food: "Lunch will be provided",
+                score: 85,
+                hasFood: true
+            },
+            {
+                id: 2,
+                title: "Career Fair",
+                location: "Recreation Center",
+                time: "Today 10:00 AM",
+                food: null,
+                score: 15,
+                hasFood: false
+            },
+            {
+                id: 3,
+                title: "Startup Pitch Night",
+                location: "Hodson Hall 210",
+                time: "Today 6:00 PM",
+                food: "Free pizza and drinks!",
+                score: 95,
+                hasFood: true
+            },
+            {
+                id: 4,
+                title: "Study Group Session",
+                location: "Brody Library",
+                time: "Today 3:00 PM",
+                food: null,
+                score: 10,
+                hasFood: false
+            },
+            {
+                id: 5,
+                title: "ACM Club Meeting",
+                location: "Malone Hall 228",
+                time: "Tomorrow 5:00 PM",
+                food: "Chipotle provided!",
+                score: 90,
+                hasFood: true
+            },
+            {
+                id: 6,
+                title: "Research Symposium",
+                location: "Glass Pavilion",
+                time: "Tomorrow 11:00 AM",
+                food: "Catered reception",
+                score: 80,
+                hasFood: true
+            }
+        ];
+
+        const messages = [
+            {
+                type: "welcome",
+                header: "👋 Welcome!",
+                content: "I'm Free Food Fetcher. I'll scan campus events and alert you when there's free food!",
+                time: "9:00 AM"
+            },
+            {
+                type: "alert",
+                header: "🍕🔥 FREE FOOD ALERT",
+                content: "<b>Startup Pitch Night</b><br>📍 Hodson Hall 210<br>🕐 Today 6:00 PM<br><br>🍽️ Free pizza and drinks!<br>📊 Confidence: HIGH (95%)",
+                time: "9:15 AM"
+            },
+            {
+                type: "alert",
+                header: "🍕 FREE FOOD ALERT",
+                content: "<b>ACM Club Meeting</b><br>📍 Malone Hall 228<br>🕐 Tomorrow 5:00 PM<br><br>🍽️ Chipotle provided!<br>📊 Confidence: HIGH (90%)",
+                time: "9:15 AM"
+            },
+            {
+                type: "digest",
+                header: "📊 Daily Digest",
+                content: "Found <b>4 events</b> with free food today!<br><br>1. Startup Pitch Night (95%)<br>2. ACM Meeting (90%)<br>3. Tech Talk (85%)<br>4. Research Symposium (80%)",
+                time: "9:20 AM"
+            }
+        ];
+
+        let currentEventIndex = 0;
+        let currentMessageIndex = 0;
+        let scanning = false;
+
+        function renderEvent(event, delay) {
+            const eventsList = document.getElementById('events-list');
+            const card = document.createElement('div');
+            card.className = `event-card ${event.hasFood ? 'has-food' : 'no-food'}`;
+
+            card.innerHTML = `
+                <div class="event-header">
+                    <div class="event-title">${event.hasFood ? '🍕 ' : ''}${event.title}</div>
+                    ${event.hasFood ? `<div class="food-badge">FREE FOOD</div>` : ''}
+                </div>
+                <div class="event-details">
+                    <span>📍 ${event.location}</span>
+                    <span>🕐 ${event.time}</span>
+                </div>
+                ${event.food ? `<div class="food-signal">"${event.food}"</div>` : ''}
+                <div class="food-score">
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="score-text">${event.score}%</div>
+                </div>
+            `;
+
+            eventsList.appendChild(card);
+
+            setTimeout(() => {
+                card.classList.add('visible');
+                card.querySelector('.score-fill').style.width = event.score + '%';
+            }, delay);
+        }
+
+        function renderMessage(msg, delay) {
+            const messagesDiv = document.getElementById('phone-messages');
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${msg.type === 'alert' ? 'message-alert' : ''}`;
+
+            messageEl.innerHTML = `
+                <div class="message-header">${msg.header}</div>
+                <div class="message-content">${msg.content}</div>
+                <div class="message-time">${msg.time}</div>
+            `;
+
+            messagesDiv.appendChild(messageEl);
+
+            setTimeout(() => {
+                messageEl.classList.add('visible');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }, delay);
+        }
+
+        function updateStats() {
+            const foodEvents = events.filter(e => e.hasFood).length;
+            document.getElementById('stat-events').textContent = events.length;
+            document.getElementById('stat-food').textContent = foodEvents;
+            document.getElementById('stat-alerts').textContent = foodEvents;
+            document.getElementById('stat-saved').textContent = '$' + (foodEvents * 12);
+        }
+
+        function startScan() {
+            if (scanning) return;
+            scanning = true;
+
+            const btn = document.querySelector('.scan-btn');
+            btn.classList.add('scanning');
+            btn.textContent = '🔄 Scanning...';
+
+            // Clear existing
+            document.getElementById('events-list').innerHTML = '';
+            document.getElementById('phone-messages').innerHTML = '';
+
+            // Render events one by one
+            events.forEach((event, index) => {
+                setTimeout(() => {
+                    renderEvent(event, 0);
+
+                    // Update stats progressively
+                    document.getElementById('stat-events').textContent = index + 1;
+                    if (event.hasFood) {
+                        const current = parseInt(document.getElementById('stat-food').textContent);
+                        document.getElementById('stat-food').textContent = current + 1;
+                        document.getElementById('stat-alerts').textContent = current + 1;
+                        document.getElementById('stat-saved').textContent = '$' + ((current + 1) * 12);
+                    }
+                }, index * 500);
+            });
+
+            // Render messages
+            setTimeout(() => {
+                messages.forEach((msg, index) => {
+                    setTimeout(() => {
+                        renderMessage(msg, 0);
+                    }, index * 800);
+                });
+            }, events.length * 500 + 500);
+
+            // Reset button
+            setTimeout(() => {
+                btn.classList.remove('scanning');
+                btn.textContent = '🔍 Scan for Food';
+                scanning = false;
+            }, events.length * 500 + messages.length * 800 + 1000);
+        }
+
+        // Auto-start on load
+        setTimeout(startScan, 1000);
+    </script>
+</body>
+</html>

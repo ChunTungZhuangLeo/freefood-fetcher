@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distill - Live Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: #8b5cf6;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        /* Main Layout */
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1000px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panels */
+        .panel {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: rgba(255,255,255,0.03);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            border-radius: 20px;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* Input Section */
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            background: #0d0d14;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        textarea::placeholder {
+            color: #444;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: #0d0d14;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Output Section */
+        .output-area {
+            background: #0d0d14;
+            border-radius: 12px;
+            min-height: 300px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            overflow: auto;
+            max-height: 500px;
+        }
+
+        .output-content {
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+
+        .original-text {
+            color: #888;
+        }
+
+        .new-text {
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .diff-added {
+            background: rgba(34, 197, 94, 0.15);
+            border-left: 3px solid #22c55e;
+            padding-left: 10px;
+            margin: 5px 0;
+        }
+
+        /* Status */
+        .status-bar {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Progress */
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #1a1a2e;
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .step-dot.complete {
+            border-color: #22c55e;
+            background: #22c55e;
+            color: #000;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .step-label.active {
+            color: #8b5cf6;
+        }
+
+        /* Analysis Panel */
+        .analysis-section {
+            background: #0d0d14;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .analysis-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #8b5cf6;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .analysis-item {
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+
+        .analysis-label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .analysis-value {
+            font-size: 0.9rem;
+        }
+
+        /* Morning Report */
+        .morning-report {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            display: none;
+        }
+
+        .morning-report.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .report-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .report-stat {
+            text-align: center;
+        }
+
+        .report-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
+        .report-stat-label {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* Templates */
+        .templates {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .template-btn {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+            color: #fff;
+        }
+
+        /* Loading Animation */
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            padding: 10px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #8b5cf6;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        footer a {
+            color: #8b5cf6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">DISTILL</div>
+            <h1>Live <span>Demo</span></h1>
+            <p class="subtitle">Paste an incomplete document and watch Distill extend it</p>
+        </header>
+
+        <!-- Progress Steps -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-step">
+                    <div class="step-dot" id="step1">1</div>
+                    <div class="step-label">Input</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-dot" id="step2">2</div>
+                    <div class="step-label">Analyze</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-dot" id="step3">3</div>
+                    <div class="step-label">Style</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-dot" id="step4">4</div>
+                    <div class="step-label">Extend</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-dot" id="step5">5</div>
+                    <div class="step-label">Done</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Demo Grid -->
+        <div class="demo-grid">
+            <!-- Input Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        📄 Your Incomplete Document
+                        <span class="panel-badge">INPUT</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="templates">
+                        <button class="template-btn" onclick="loadTemplate('readme')">README.md</button>
+                        <button class="template-btn" onclick="loadTemplate('report')">Q2 Report</button>
+                        <button class="template-btn" onclick="loadTemplate('email')">Email Draft</button>
+                        <button class="template-btn" onclick="loadTemplate('essay')">Essay</button>
+                    </div>
+
+                    <div class="input-section">
+                        <label class="input-label">Paste your incomplete document:</label>
+                        <textarea id="documentInput" placeholder="# My Document
+
+## Introduction
+
+Start writing here... leave it incomplete and let Distill continue it."></textarea>
+                    </div>
+
+                    <div class="input-section">
+                        <label class="input-label">Context (optional):</label>
+                        <input type="text" id="contextInput" placeholder="e.g., This is a hackathon project README for judges">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="runBtn" onclick="runDistill()">
+                            ▶️ Run Distill
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearAll()">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        ✨ Extended Document
+                        <span class="panel-badge">OUTPUT</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <!-- Analysis Section -->
+                    <div class="analysis-section" id="analysisSection" style="display: none;">
+                        <div class="analysis-title">📊 Document Analysis</div>
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <div class="analysis-label">Completion</div>
+                                <div class="analysis-value" id="analysisCompletion">—</div>
+                            </div>
+                            <div class="analysis-item">
+                                <div class="analysis-label">Document Type</div>
+                                <div class="analysis-value" id="analysisType">—</div>
+                            </div>
+                            <div class="analysis-item">
+                                <div class="analysis-label">Tone</div>
+                                <div class="analysis-value" id="analysisTone">—</div>
+                            </div>
+                            <div class="analysis-item">
+                                <div class="analysis-label">Missing Sections</div>
+                                <div class="analysis-value" id="analysisMissing">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Output Area -->
+                    <div class="output-area">
+                        <div class="output-content" id="outputContent">
+                            <span style="color: #666;">Extended document will appear here...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-value" id="statOriginal">0</div>
+                    <div class="status-label">Original Words</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="statAdded">0</div>
+                    <div class="status-label">Words Added</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="statSections">0</div>
+                    <div class="status-label">Sections Added</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="statTime">0s</div>
+                    <div class="status-label">Processing Time</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Morning Report -->
+        <div class="morning-report" id="morningReport">
+            <div class="report-header">☀️ Distill Complete!</div>
+            <div class="report-stats">
+                <div class="report-stat">
+                    <div class="report-stat-value" id="reportWords">0</div>
+                    <div class="report-stat-label">words added</div>
+                </div>
+                <div class="report-stat">
+                    <div class="report-stat-value" id="reportSections">0</div>
+                    <div class="report-stat-label">sections added</div>
+                </div>
+            </div>
+            <p style="color: #aaa;">Your document has been extended. The new content is highlighted in <span style="color: #22c55e;">green</span> above.</p>
+        </div>
+    </div>
+
+    <footer>
+        Built at <a href="https://ara.so">Ara</a> x JHU Hackathon 2025 | Powered by Claude AI
+    </footer>
+
+    <script>
+        // Templates
+        const templates = {
+            readme: `# Night Shift - Hackathon Project
+
+## Introduction
+
+Night Shift is an AI agent that works while you sleep. The core idea is simple: instead of waking up to chaos, you wake up to clarity.
+
+## The Problem
+
+Every morning, knowledge workers face the same challenge:
+- 50+ unread emails
+- Back-to-back meetings with no prep time
+- Scattered files and forgotten tasks
+
+This leads to spending the first 2 hours just figuring out what to do.
+
+## Our Solution
+
+Night Shift runs overnight on Ara's cloud infrastructure to`,
+
+            report: `# Q2 2025 Performance Report
+
+## Executive Summary
+
+This quarter showed significant progress across all key metrics. Revenue increased by 23% compared to Q1, and user engagement reached an all-time high.
+
+## Key Metrics
+
+- Monthly Active Users: 1.2M (+18%)
+- Revenue: $4.2M (+23%)
+- Customer Satisfaction: 4.7/5
+
+## Highlights
+
+The launch of our new AI features drove substantial growth in the enterprise segment. Key wins include`,
+
+            email: `Hi Sarah,
+
+Thanks for sending over the project proposal. I've reviewed it and have some thoughts.
+
+Overall, I think the direction is solid. The timeline seems realistic, and the budget allocation makes sense for a project of this scope.
+
+A few specific points:
+
+1. The integration timeline might be tight. We should`,
+
+            essay: `# The Future of Human-AI Collaboration
+
+## Introduction
+
+As artificial intelligence becomes increasingly sophisticated, the nature of human work is fundamentally changing. Rather than replacing human workers, the most promising developments point toward a future of collaboration.
+
+## The Current State
+
+Today's AI tools excel at specific tasks: analyzing data, generating text, recognizing patterns. However, they still lack the contextual understanding and creative judgment that humans bring.
+
+## The Emerging Model
+
+A new paradigm is emerging where`
+        };
+
+        // Simulated extensions for each template
+        const extensions = {
+            readme: `
+
+## Technical Architecture
+
+Night Shift is built on a three-tier architecture designed for reliability and scalability:
+
+### 1. Data Collection Layer
+- **Email Integration**: Secure OAuth connection to Gmail/Outlook
+- **Calendar Sync**: Real-time sync with Google Calendar and Outlook
+- **File Monitoring**: Watches designated folders for changes
+
+### 2. Analysis Engine
+- **Priority Scoring**: ML model trained on user behavior to rank importance
+- **Conflict Detection**: Identifies scheduling conflicts and time crunches
+- **Pattern Recognition**: Learns your work patterns over time
+
+### 3. Delivery System
+- **Multi-Channel**: Telegram, WhatsApp, Discord, or email
+- **Customizable Timing**: Set your preferred briefing time
+- **Interactive Actions**: One-tap responses and approvals
+
+## Getting Started
+
+\`\`\`bash
+# Clone the repository
+git clone https://github.com/yourname/night-shift
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure your API keys
+cp .env.example .env
+
+# Run the agent
+python run_night_shift.py
+\`\`\`
+
+## Why Ara?
+
+Night Shift leverages Ara's cloud infrastructure for:
+- **24/7 Execution**: Agent runs continuously without your computer
+- **Isolated Sandboxes**: Your data remains secure and private
+- **Multi-Channel Delivery**: Reach users wherever they are
+
+## Roadmap
+
+- [ ] Voice briefing option
+- [ ] Slack integration
+- [ ] Smart meeting prep
+- [ ] Automatic file organization
+
+## Team
+
+Built with ❤️ at Ara x JHU Hackathon 2025`,
+
+            report: `cluded partnerships with three Fortune 500 companies.
+
+## Detailed Analysis
+
+### Revenue Breakdown
+
+| Segment | Q2 Revenue | Growth |
+|---------|-----------|--------|
+| Enterprise | $2.1M | +34% |
+| SMB | $1.4M | +18% |
+| Consumer | $0.7M | +8% |
+
+The enterprise segment continues to be our strongest performer, driven by the new AI-powered analytics dashboard launched in April.
+
+### User Engagement
+
+Daily active users increased from 420K to 510K, a 21% improvement. Average session duration increased by 12 minutes, indicating deeper product engagement.
+
+### Customer Acquisition
+
+- Customer Acquisition Cost (CAC): $42 (down from $58)
+- Lifetime Value (LTV): $380 (up from $320)
+- LTV:CAC Ratio: 9.0x (industry benchmark: 3.0x)
+
+## Challenges
+
+1. **Infrastructure Scaling**: Peak usage periods caused latency issues in May. We've since upgraded our cloud infrastructure.
+
+2. **Talent Acquisition**: Technical hiring remains competitive. We've implemented a new referral program to address this.
+
+## Q3 Outlook
+
+Based on current momentum and pipeline, we project:
+- Revenue: $5.0M - $5.4M
+- MAU: 1.4M - 1.5M
+
+Key initiatives for Q3:
+1. Launch mobile app v2.0
+2. Expand enterprise sales team
+3. Enter European market
+
+## Conclusion
+
+Q2 demonstrated strong execution across all business areas. With continued focus on enterprise growth and product innovation, we are well-positioned to achieve our annual targets.`,
+
+            email: `consider adding a buffer week before the launch date.
+
+2. For the budget, I'd suggest allocating a bit more to QA testing. Given the complexity of the integration, we'll want thorough testing before going live.
+
+3. The team structure looks good, but we might want to add a dedicated project manager. I can recommend a few people if helpful.
+
+4. One thing I didn't see mentioned: what's our rollback plan if the integration has issues post-launch?
+
+I'm generally supportive of moving forward. Should we schedule a quick call this week to discuss? I'm free Thursday afternoon or Friday morning.
+
+Also, I'd like to loop in Mike from engineering to review the technical specs. He has experience with similar integrations and might catch things we'd miss.
+
+Let me know your thoughts.
+
+Best,
+Alex`,
+
+            essay: `humans and AI systems work together, each contributing their unique strengths. Humans provide creativity, ethical judgment, and contextual understanding. AI provides speed, consistency, and the ability to process vast amounts of information.
+
+## Case Studies
+
+### Healthcare
+At Johns Hopkins Hospital, AI systems now assist radiologists in analyzing medical images. The AI flags potential concerns, while human doctors make the final diagnosis. This collaboration has improved detection rates by 34% while maintaining the human judgment essential for patient care.
+
+### Creative Industries
+Musicians are using AI tools to generate melodic ideas, which they then refine and arrange. The AI handles the combinatorial exploration; the human provides the artistic vision.
+
+## Challenges Ahead
+
+Several obstacles must be addressed:
+
+1. **Trust Calibration**: Humans must learn when to trust AI recommendations and when to override them.
+
+2. **Skill Evolution**: As AI handles routine tasks, humans must develop new skills focused on oversight, creativity, and complex judgment.
+
+3. **Ethical Frameworks**: We need clear guidelines for accountability when human-AI teams make decisions.
+
+## The Path Forward
+
+The future belongs not to AI alone, nor to humans resisting change, but to those who master the art of collaboration. This requires:
+
+- Education systems that teach AI literacy
+- Workplace cultures that embrace human-AI teaming
+- Technology designed for collaboration, not replacement
+
+## Conclusion
+
+The question is not whether AI will transform work—it already is. The question is whether we will shape that transformation thoughtfully, creating a future where technology amplifies human potential rather than diminishing it. The choice is ours to make.`
+        };
+
+        let isRunning = false;
+
+        function loadTemplate(name) {
+            document.getElementById('documentInput').value = templates[name];
+            document.getElementById('contextInput').value = {
+                readme: 'Hackathon project README for judges',
+                report: 'Quarterly business report for stakeholders',
+                email: 'Professional email to a colleague',
+                essay: 'Academic essay on technology'
+            }[name];
+        }
+
+        async function runDistill() {
+            if (isRunning) return;
+
+            const input = document.getElementById('documentInput').value.trim();
+            if (!input) {
+                alert('Please paste a document first');
+                return;
+            }
+
+            isRunning = true;
+            const startTime = Date.now();
+            const btn = document.getElementById('runBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Processing...';
+
+            // Reset UI
+            document.querySelectorAll('.step-dot').forEach(d => {
+                d.classList.remove('active', 'complete');
+            });
+            document.getElementById('morningReport').classList.remove('show');
+
+            // Determine which template was used
+            let extension = '';
+            for (const [key, template] of Object.entries(templates)) {
+                if (input.includes(template.substring(0, 50))) {
+                    extension = extensions[key];
+                    break;
+                }
+            }
+
+            // If no template matched, generate generic extension
+            if (!extension) {
+                extension = `
+
+## Additional Section
+
+Based on the content above, here are some additional points to consider:
+
+### Key Insights
+
+The core ideas presented establish a strong foundation. To build upon this:
+
+1. **Expansion of main concept**: The primary thesis could be developed further with specific examples and evidence.
+
+2. **Practical applications**: Consider how these ideas translate into actionable steps.
+
+3. **Future considerations**: What are the implications going forward?
+
+### Conclusion
+
+This document provides a solid starting point. The ideas presented here merit further exploration and development.`;
+            }
+
+            // Step 1: Input
+            await animateStep(1, 'active');
+            await sleep(500);
+            await animateStep(1, 'complete');
+
+            // Step 2: Analyze
+            await animateStep(2, 'active');
+            document.getElementById('analysisSection').style.display = 'block';
+            await sleep(800);
+            document.getElementById('analysisCompletion').textContent = '~55%';
+            await sleep(400);
+            document.getElementById('analysisType').textContent = 'Technical Doc';
+            await sleep(400);
+            document.getElementById('analysisTone').textContent = 'Professional';
+            await sleep(400);
+            document.getElementById('analysisMissing').textContent = '3-4 sections';
+            await animateStep(2, 'complete');
+
+            // Step 3: Style
+            await animateStep(3, 'active');
+            await sleep(1000);
+            await animateStep(3, 'complete');
+
+            // Step 4: Extend
+            await animateStep(4, 'active');
+
+            // Animate typing
+            const outputContent = document.getElementById('outputContent');
+            outputContent.innerHTML = `<span class="original-text">${escapeHtml(input)}</span>`;
+
+            // Type out new content
+            const newTextSpan = document.createElement('span');
+            newTextSpan.className = 'new-text';
+            outputContent.appendChild(newTextSpan);
+
+            let charIndex = 0;
+            while (charIndex < extension.length) {
+                newTextSpan.textContent = extension.substring(0, charIndex);
+                charIndex += Math.floor(Math.random() * 8) + 3;
+
+                // Update stats
+                const newWords = newTextSpan.textContent.split(/\s+/).filter(w => w).length;
+                document.getElementById('statAdded').textContent = newWords;
+
+                const sections = (newTextSpan.textContent.match(/^##/gm) || []).length;
+                document.getElementById('statSections').textContent = sections;
+
+                await sleep(15);
+                outputContent.parentElement.scrollTop = outputContent.parentElement.scrollHeight;
+            }
+
+            newTextSpan.textContent = extension;
+            await animateStep(4, 'complete');
+
+            // Step 5: Done
+            await animateStep(5, 'active');
+            await sleep(500);
+            await animateStep(5, 'complete');
+
+            // Final stats
+            const originalWords = input.split(/\s+/).filter(w => w).length;
+            const addedWords = extension.split(/\s+/).filter(w => w).length;
+            const sections = (extension.match(/^##/gm) || []).length;
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+            document.getElementById('statOriginal').textContent = originalWords;
+            document.getElementById('statAdded').textContent = addedWords;
+            document.getElementById('statSections').textContent = sections;
+            document.getElementById('statTime').textContent = elapsed + 's';
+
+            // Show morning report
+            document.getElementById('reportWords').textContent = addedWords;
+            document.getElementById('reportSections').textContent = sections;
+            document.getElementById('morningReport').classList.add('show');
+
+            // Reset button
+            btn.disabled = false;
+            btn.innerHTML = '▶️ Run Again';
+            isRunning = false;
+        }
+
+        async function animateStep(num, state) {
+            const step = document.getElementById('step' + num);
+            if (state === 'active') {
+                step.classList.add('active');
+            } else if (state === 'complete') {
+                step.classList.remove('active');
+                step.classList.add('complete');
+                step.textContent = '✓';
+            }
+            await sleep(300);
+        }
+
+        function clearAll() {
+            document.getElementById('documentInput').value = '';
+            document.getElementById('contextInput').value = '';
+            document.getElementById('outputContent').innerHTML = '<span style="color: #666;">Extended document will appear here...</span>';
+            document.getElementById('analysisSection').style.display = 'none';
+            document.getElementById('morningReport').classList.remove('show');
+            document.querySelectorAll('.step-dot').forEach((d, i) => {
+                d.classList.remove('active', 'complete');
+                d.textContent = i + 1;
+            });
+            ['statOriginal', 'statAdded', 'statSections'].forEach(id => {
+                document.getElementById(id).textContent = '0';
+            });
+            document.getElementById('statTime').textContent = '0s';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Load default template
+        loadTemplate('readme');
+    </script>
+</body>
+</html>

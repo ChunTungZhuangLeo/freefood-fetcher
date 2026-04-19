@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Food Fetcher - JHU Campus Map</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a1a;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .ara-badge {
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ara-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .scan-btn {
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: #000;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .scan-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 25px rgba(255,107,107,0.4);
+        }
+
+        /* Map Container */
+        #map {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 400px;
+            bottom: 0;
+            z-index: 1;
+        }
+
+        /* Side Panel */
+        .side-panel {
+            position: fixed;
+            top: 70px;
+            right: 0;
+            width: 400px;
+            bottom: 0;
+            background: rgba(15, 15, 30, 0.98);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .panel-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Event Cards */
+        .event-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .event-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .event-card.has-food {
+            border-left: 3px solid #00ff88;
+        }
+
+        .event-card.selected {
+            border: 1px solid #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+
+        .event-card.uncertain {
+            border-left: 3px solid #feca57;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .event-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .food-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .food-badge.high {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .food-badge.medium {
+            background: #feca57;
+            color: #000;
+        }
+
+        .food-badge.low {
+            background: rgba(255,255,255,0.2);
+            color: #888;
+        }
+
+        .event-location {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .event-time {
+            font-size: 0.8rem;
+            color: #00d9ff;
+        }
+
+        .event-signal {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #feca57;
+            font-style: italic;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00ff88;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .legend-marker {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .legend-marker.food {
+            background: #00ff88;
+        }
+
+        .legend-marker.maybe {
+            background: #feca57;
+        }
+
+        .legend-marker.none {
+            background: #888;
+        }
+
+        /* Custom Map Markers */
+        .custom-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .custom-marker:hover {
+            transform: scale(1.2);
+        }
+
+        .custom-marker.food {
+            background: linear-gradient(135deg, #00ff88, #00d9ff);
+        }
+
+        .custom-marker.maybe {
+            background: linear-gradient(135deg, #feca57, #ff6b6b);
+        }
+
+        .custom-marker.none {
+            background: #444;
+        }
+
+        .marker-pulse {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(0, 255, 136, 0.3);
+            animation: markerPulse 2s infinite;
+        }
+
+        @keyframes markerPulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Popup styling */
+        .leaflet-popup-content-wrapper {
+            background: rgba(15, 15, 30, 0.95);
+            color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .leaflet-popup-tip {
+            background: rgba(15, 15, 30, 0.95);
+        }
+
+        .popup-content {
+            padding: 5px;
+        }
+
+        .popup-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .popup-detail {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .popup-food {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .popup-uncertain {
+            background: rgba(254,202,87,0.2);
+            color: #feca57;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <span class="logo-icon">🍕</span>
+            <div>
+                <div class="logo-text">Free Food Fetcher</div>
+                <div class="logo-sub">Johns Hopkins University - Homewood Campus</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="ara-badge">
+                <span class="dot"></span>
+                Live on Ara Cloud
+            </div>
+            <button class="scan-btn" onclick="scanForFood()">🔍 Scan Campus</button>
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Side Panel -->
+    <div class="side-panel">
+        <div class="panel-section">
+            <div class="section-title">📊 Today's Stats</div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="stat-events">0</div>
+                    <div class="stat-label">Events Found</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="stat-food">0</div>
+                    <div class="stat-label">Free Food</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="stat-maybe">0</div>
+                    <div class="stat-label">Maybe Food</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="stat-saved">$0</div>
+                    <div class="stat-label">Saved Today</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <div class="section-title">🗺️ Map Legend</div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-marker food">🍕</div>
+                    <span>Free Food (80%+)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-marker maybe">❓</div>
+                    <span>Maybe Food (50-79%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-marker none">📍</div>
+                    <span>No Food Detected</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <div class="section-title">📅 Upcoming Events</div>
+            <div id="events-list">
+                <!-- Events inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // JHU Homewood Campus center coordinates
+        const JHU_CENTER = [39.3299, -76.6205];
+
+        // Real JHU building locations with events
+        const locations = [
+            {
+                id: 1,
+                name: "Bloomberg Center for Physics",
+                coords: [39.3295, -76.6223],
+                event: "Physics Department Seminar",
+                time: "Today 12:00 PM",
+                food: "Lunch will be provided for attendees",
+                score: 85,
+                type: "food"
+            },
+            {
+                id: 2,
+                name: "Hodson Hall",
+                coords: [39.3277, -76.6217],
+                event: "Startup Pitch Night",
+                time: "Today 6:00 PM",
+                food: "Free pizza and drinks!",
+                score: 95,
+                type: "food"
+            },
+            {
+                id: 3,
+                name: "Malone Hall",
+                coords: [39.3269, -76.6211],
+                event: "ACM Club Meeting",
+                time: "Tomorrow 5:00 PM",
+                food: "Chipotle provided!",
+                score: 92,
+                type: "food"
+            },
+            {
+                id: 4,
+                name: "Shaffer Hall",
+                coords: [39.3289, -76.6187],
+                event: "Career Services Workshop",
+                time: "Today 2:00 PM",
+                food: "Light refreshments",
+                score: 65,
+                type: "maybe"
+            },
+            {
+                id: 5,
+                name: "Krieger Hall",
+                coords: [39.3283, -76.6197],
+                event: "Guest Lecture: AI Ethics",
+                time: "Today 4:00 PM",
+                food: "Reception to follow",
+                score: 70,
+                type: "maybe"
+            },
+            {
+                id: 6,
+                name: "Gilman Hall",
+                coords: [39.3291, -76.6218],
+                event: "Department Meeting",
+                time: "Today 10:00 AM",
+                food: null,
+                score: 15,
+                type: "none"
+            },
+            {
+                id: 7,
+                name: "Brody Learning Commons",
+                coords: [39.3282, -76.6191],
+                event: "Study Break Event",
+                time: "Tonight 9:00 PM",
+                food: "Snacks and coffee provided",
+                score: 78,
+                type: "maybe"
+            },
+            {
+                id: 8,
+                name: "Glass Pavilion",
+                coords: [39.3301, -76.6198],
+                event: "Research Symposium",
+                time: "Tomorrow 11:00 AM",
+                food: "Catered lunch reception",
+                score: 88,
+                type: "food"
+            },
+            {
+                id: 9,
+                name: "Levering Hall",
+                coords: [39.3275, -76.6203],
+                event: "Student Government Meeting",
+                time: "Today 7:00 PM",
+                food: null,
+                score: 20,
+                type: "none"
+            },
+            {
+                id: 10,
+                name: "Mason Hall",
+                coords: [39.3286, -76.6230],
+                event: "Wellness Wednesday",
+                time: "Today 12:30 PM",
+                food: "Healthy snacks available",
+                score: 72,
+                type: "maybe"
+            },
+            {
+                id: 11,
+                name: "Hackerman Hall",
+                coords: [39.3264, -76.6205],
+                event: "CS Department Talk",
+                time: "Today 3:30 PM",
+                food: "Pizza after the talk",
+                score: 90,
+                type: "food"
+            },
+            {
+                id: 12,
+                name: "Mattin Center",
+                coords: [39.3260, -76.6195],
+                event: "Art Exhibition Opening",
+                time: "Today 5:00 PM",
+                food: "Wine and cheese reception",
+                score: 85,
+                type: "food"
+            }
+        ];
+
+        // Initialize map
+        const map = L.map('map', {
+            zoomControl: true
+        }).setView(JHU_CENTER, 17);
+
+        // Add dark map tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Store markers
+        const markers = [];
+
+        // Create custom icon
+        function createIcon(type) {
+            let emoji, bgColor;
+            if (type === 'food') {
+                emoji = '🍕';
+                bgColor = 'linear-gradient(135deg, #00ff88, #00d9ff)';
+            } else if (type === 'maybe') {
+                emoji = '❓';
+                bgColor = 'linear-gradient(135deg, #feca57, #ff6b6b)';
+            } else {
+                emoji = '📍';
+                bgColor = '#555';
+            }
+
+            return L.divIcon({
+                html: `
+                    <div style="
+                        width: 40px;
+                        height: 40px;
+                        background: ${bgColor};
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.3rem;
+                        box-shadow: 0 3px 15px rgba(0,0,0,0.4);
+                        border: 2px solid white;
+                    ">${emoji}</div>
+                `,
+                className: 'custom-div-icon',
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+        }
+
+        // Add markers to map
+        function addMarkers() {
+            locations.forEach((loc, index) => {
+                setTimeout(() => {
+                    const marker = L.marker(loc.coords, {
+                        icon: createIcon(loc.type)
+                    }).addTo(map);
+
+                    // Create popup content
+                    let foodHtml = '';
+                    if (loc.food) {
+                        const popupClass = loc.type === 'food' ? 'popup-food' : 'popup-uncertain';
+                        foodHtml = `<div class="${popupClass}">🍽️ "${loc.food}"<br>📊 Confidence: ${loc.score}%</div>`;
+                    }
+
+                    marker.bindPopup(`
+                        <div class="popup-content">
+                            <div class="popup-title">${loc.event}</div>
+                            <div class="popup-detail">📍 ${loc.name}</div>
+                            <div class="popup-detail">🕐 ${loc.time}</div>
+                            ${foodHtml}
+                        </div>
+                    `);
+
+                    markers.push(marker);
+
+                    // Update stats
+                    updateStats(index + 1);
+
+                }, index * 300);
+            });
+        }
+
+        // Update stats
+        function updateStats(total) {
+            const foodCount = locations.slice(0, total).filter(l => l.type === 'food').length;
+            const maybeCount = locations.slice(0, total).filter(l => l.type === 'maybe').length;
+
+            document.getElementById('stat-events').textContent = total;
+            document.getElementById('stat-food').textContent = foodCount;
+            document.getElementById('stat-maybe').textContent = maybeCount;
+            document.getElementById('stat-saved').textContent = '$' + (foodCount * 12 + maybeCount * 5);
+        }
+
+        // Render event cards
+        function renderEvents() {
+            const eventsList = document.getElementById('events-list');
+            eventsList.innerHTML = '';
+
+            // Sort by score
+            const sorted = [...locations].sort((a, b) => b.score - a.score);
+
+            sorted.forEach((loc, index) => {
+                setTimeout(() => {
+                    const card = document.createElement('div');
+                    card.className = `event-card ${loc.type === 'food' ? 'has-food' : ''} ${loc.type === 'maybe' ? 'uncertain' : ''}`;
+
+                    let badgeClass = 'low';
+                    let badgeText = 'No Food';
+                    if (loc.score >= 80) {
+                        badgeClass = 'high';
+                        badgeText = `${loc.score}% 🍕`;
+                    } else if (loc.score >= 50) {
+                        badgeClass = 'medium';
+                        badgeText = `${loc.score}% ❓`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="event-header">
+                            <div class="event-title">${loc.event}</div>
+                            <div class="food-badge ${badgeClass}">${badgeText}</div>
+                        </div>
+                        <div class="event-location">📍 ${loc.name}</div>
+                        <div class="event-time">🕐 ${loc.time}</div>
+                        ${loc.food ? `<div class="event-signal">"${loc.food}"</div>` : ''}
+                    `;
+
+                    card.onclick = () => {
+                        map.flyTo(loc.coords, 18);
+                        markers[locations.indexOf(loc)].openPopup();
+
+                        // Highlight card
+                        document.querySelectorAll('.event-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                    };
+
+                    eventsList.appendChild(card);
+                }, index * 100);
+            });
+        }
+
+        // Scan function
+        function scanForFood() {
+            // Clear existing markers
+            markers.forEach(m => map.removeLayer(m));
+            markers.length = 0;
+
+            // Reset stats
+            document.getElementById('stat-events').textContent = '0';
+            document.getElementById('stat-food').textContent = '0';
+            document.getElementById('stat-maybe').textContent = '0';
+            document.getElementById('stat-saved').textContent = '$0';
+
+            // Re-add markers with animation
+            addMarkers();
+            renderEvents();
+        }
+
+        // Initialize
+        setTimeout(() => {
+            addMarkers();
+            renderEvents();
+        }, 500);
+    </script>
+</body>
+</html>

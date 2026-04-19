@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distill - Pitch Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+        }
+
+        .slide.active { display: flex; }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            line-height: 1.1;
+        }
+
+        h1 .gradient {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 { font-size: 2.5rem; margin-bottom: 40px; }
+
+        p {
+            font-size: 1.8rem;
+            color: #aaa;
+            max-width: 900px;
+            line-height: 1.5;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            color: #8b5cf6;
+            margin-bottom: 20px;
+        }
+
+        .big-emoji { font-size: 5rem; margin-bottom: 30px; }
+
+        .slide-num {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            color: #444;
+        }
+
+        /* Scenario */
+        .scenario {
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 800px;
+            text-align: left;
+            margin-top: 40px;
+        }
+
+        .scenario-time {
+            color: #8b5cf6;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .scenario-text {
+            font-size: 1.4rem;
+            line-height: 1.8;
+        }
+
+        .scenario-text .highlight {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .tl-item {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            flex: 1;
+        }
+
+        .tl-icon { font-size: 2.5rem; margin-bottom: 15px; }
+        .tl-time { color: #8b5cf6; font-size: 0.9rem; margin-bottom: 8px; }
+        .tl-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+        .tl-desc { font-size: 0.95rem; color: #888; }
+
+        /* Compare */
+        .compare {
+            display: flex;
+            gap: 60px;
+            margin-top: 40px;
+        }
+
+        .compare-box {
+            flex: 1;
+            padding: 40px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            text-align: left;
+        }
+
+        .compare-box.before { border: 2px solid #ef4444; }
+        .compare-box.after { border: 2px solid #22c55e; }
+
+        .compare-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        .compare-list {
+            list-style: none;
+            font-size: 1.2rem;
+            line-height: 2;
+            color: #aaa;
+        }
+
+        /* Message mockup */
+        .message-mockup {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 450px;
+            text-align: left;
+            margin-top: 30px;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .message-mockup .header {
+            color: #8b5cf6;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Tech stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .tech-item {
+            padding: 30px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tech-item h3 {
+            font-size: 1.3rem;
+            margin: 15px 0 10px;
+        }
+
+        .tech-item p {
+            font-size: 0.95rem;
+            color: #888;
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+
+        .controls button {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .controls button:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+        }
+
+        .footer-badge {
+            position: absolute;
+            bottom: 30px;
+            left: 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title -->
+    <div class="slide active">
+        <div class="logo">DISTILL</div>
+        <h1>Your AI <span class="gradient">continues your work</span><br>while you sleep</h1>
+        <p>The AI shadow that learns from you and extends your output overnight</p>
+        <div class="slide-num">1/8</div>
+    </div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide">
+        <div class="big-emoji">😴</div>
+        <h1>You go to sleep with <span class="gradient">unfinished work</span></h1>
+        <p>The report is 60% done. The research is scattered. The draft sits incomplete.</p>
+        <p style="margin-top: 30px; color: #ef4444;">You lose momentum. Tomorrow, you'll have to rebuild context.</p>
+        <div class="slide-num">2/8</div>
+    </div>
+
+    <!-- Slide 3: The Insight -->
+    <div class="slide">
+        <h2>What if your AI didn't just answer questions...</h2>
+        <h1><span class="gradient">but actually did the work?</span></h1>
+        <div class="slide-num">3/8</div>
+    </div>
+
+    <!-- Slide 4: How It Works -->
+    <div class="slide">
+        <h2>Meet Distill</h2>
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-icon">👁️</div>
+                <div class="tl-time">DAYTIME</div>
+                <div class="tl-title">Observe</div>
+                <div class="tl-desc">Watches your work<br>Learns your style</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-icon">🧠</div>
+                <div class="tl-time">EVENING</div>
+                <div class="tl-title">Distill</div>
+                <div class="tl-desc">Understands intent<br>Finds incomplete work</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-icon">✍️</div>
+                <div class="tl-time">3:00 AM</div>
+                <div class="tl-title">Extend</div>
+                <div class="tl-desc">Continues documents<br>In YOUR voice</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-icon">☀️</div>
+                <div class="tl-time">7:00 AM</div>
+                <div class="tl-title">Report</div>
+                <div class="tl-desc">Shows what it did<br>Ready for review</div>
+            </div>
+        </div>
+        <div class="slide-num">4/8</div>
+    </div>
+
+    <!-- Slide 5: Example -->
+    <div class="slide">
+        <h2>Real Example</h2>
+        <div class="scenario">
+            <div class="scenario-time">11:00 PM — You go to bed</div>
+            <div class="scenario-text">
+                "Q2 report is 60% done. Too tired to finish."
+            </div>
+        </div>
+        <div class="scenario" style="border: 2px solid #8b5cf6;">
+            <div class="scenario-time">7:00 AM — You wake up</div>
+            <div class="scenario-text">
+                "Distill continued your Q2 report.<br>
+                <span class="highlight">Added 3 sections (1,247 words).</span><br>
+                Matched your writing style. Ready for review."
+            </div>
+        </div>
+        <div class="slide-num">5/8</div>
+    </div>
+
+    <!-- Slide 6: The Morning Message -->
+    <div class="slide">
+        <h2>Wake up to this</h2>
+        <div class="message-mockup">
+            <div class="header">☀️ Good morning!</div>
+            <p style="font-size: 1rem; color: #fff;">
+                🌙 <strong>Distill worked while you slept</strong><br><br>
+                📄 <strong>Q2_Report.docx extended</strong><br>
+                → Added 1,247 words<br>
+                → 3 new sections<br>
+                → Matched your style ✓<br><br>
+                🔍 <strong>Research compiled</strong><br>
+                → 5 sources summarized<br>
+                → Key data extracted<br><br>
+                ✅ Ready for your review!
+            </p>
+        </div>
+        <div class="slide-num">6/8</div>
+    </div>
+
+    <!-- Slide 7: Why Ara -->
+    <div class="slide">
+        <h2>Powered by Ara</h2>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <div style="font-size: 2.5rem;">☁️</div>
+                <h3>24/7 Cloud Runtime</h3>
+                <p style="font-size: 0.9rem;">Agent runs overnight, even when your computer is off</p>
+            </div>
+            <div class="tech-item">
+                <div style="font-size: 2.5rem;">🔒</div>
+                <h3>Isolated Sandbox</h3>
+                <p style="font-size: 0.9rem;">Your documents stay secure in dedicated environment</p>
+            </div>
+            <div class="tech-item">
+                <div style="font-size: 2.5rem;">🧠</div>
+                <h3>Style Learning</h3>
+                <p style="font-size: 0.9rem;">Writes in YOUR voice, not generic AI</p>
+            </div>
+        </div>
+        <p style="margin-top: 50px; font-size: 1.3rem;">
+            <strong>This is the future of personal computing:</strong><br>
+            AI that works FOR you, not just WITH you.
+        </p>
+        <div class="slide-num">7/8</div>
+    </div>
+
+    <!-- Slide 8: Closing -->
+    <div class="slide">
+        <div class="logo">DISTILL</div>
+        <h1><span class="gradient">Your work, extended</span><br>while you rest</h1>
+        <p style="margin-top: 30px;">The AI shadow that finishes what you started.</p>
+        <div class="footer-badge">Built at Ara x JHU Hackathon 2025</div>
+        <div class="slide-num">8/8</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button onclick="prevSlide()">← Previous</button>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let current = 1;
+        const total = 8;
+
+        function showSlide(n) {
+            document.querySelectorAll('.slide').forEach((s, i) => {
+                s.classList.toggle('active', i === n - 1);
+            });
+            current = n;
+        }
+
+        function nextSlide() { if (current < total) showSlide(current + 1); }
+        function prevSlide() { if (current > 1) showSlide(current - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+    </script>
+</body>
+</html>
