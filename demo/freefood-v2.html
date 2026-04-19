@@ -1055,6 +1055,23 @@
             color: #888;
         }
 
+        .review-delete-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 0.7rem;
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-left: auto;
+            line-height: 1;
+        }
+
+        .review-delete-btn:hover {
+            background: rgba(255,80,80,0.15);
+            color: #ff6b6b;
+        }
+
         .review-text {
             font-size: 0.8rem;
             color: #bbb;
@@ -2541,12 +2558,13 @@ freefood = ara.<span class="function">Automation</span>(
                 const reviewsHtml = event.reviewsList && event.reviewsList.length > 0 ? `
                     <div class="event-reviews-summary">
                         ${event.reviewsList.slice(0, 2).map(r => `
-                            <div class="review-item">
+                            <div class="review-item" id="review-${r.id}">
                                 <div class="review-avatar">${r.author.charAt(0).toUpperCase()}</div>
                                 <div class="review-content">
                                     <div class="review-header">
                                         <span class="review-author">${r.author}</span>
                                         <span class="review-time">${r.timeAgo}</span>
+                                        ${r.id ? `<button class="review-delete-btn" onclick="event.stopPropagation(); deleteReview(${r.id}, ${event.id})" title="Delete review">✕</button>` : ''}
                                     </div>
                                     <div class="review-text">${r.text}</div>
                                     ${r.images ? `<div class="review-images">${r.images.map(img => `<div class="review-image">${img}</div>`).join('')}</div>` : ''}
@@ -2715,7 +2733,7 @@ freefood = ara.<span class="function">Automation</span>(
                 const ev = events.find(e => e.id === currentReviewEventId);
                 if (ev) {
                     if (!ev.reviewsList) ev.reviewsList = [];
-                    ev.reviewsList.unshift({ author: saved.author, timeAgo: 'just now', text: saved.text, images: [] });
+                    ev.reviewsList.unshift({ id: saved.id, author: saved.author, timeAgo: 'just now', text: saved.text, images: [] });
                     ev.reviews = (ev.reviews || 0) + 1;
                     if (saved.rating > 0) {
                         const prev = (ev.rating || 0) * (ev.reviews - 1);
@@ -2743,11 +2761,28 @@ freefood = ara.<span class="function">Automation</span>(
             } catch { return []; }
         }
 
+        async function deleteReview(reviewId, eventId) {
+            if (!confirm('Delete this review?')) return;
+            try {
+                const res = await fetch(`${window.location.origin}/api/reviews/${reviewId}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error(`Server ${res.status}`);
+                const ev = events.find(e => e.id === eventId);
+                if (ev) {
+                    ev.reviewsList = (ev.reviewsList || []).filter(r => r.id !== reviewId);
+                    ev.reviews = Math.max(0, (ev.reviews || 1) - 1);
+                }
+                renderEvents();
+                showToast('Review deleted.');
+            } catch (e) {
+                showToast('Error: ' + e.message);
+            }
+        }
+
         async function loadAllReviews() {
             await Promise.all(events.map(async ev => {
                 const reviews = await loadReviewsForEvent(ev.id);
                 if (reviews.length > 0) {
-                    ev.reviewsList = reviews.map(r => ({ author: r.author, timeAgo: r.timeAgo, text: r.text, images: [] }));
+                    ev.reviewsList = reviews.map(r => ({ id: r.id, author: r.author, timeAgo: r.timeAgo, text: r.text, images: [] }));
                     ev.reviews = reviews.length;
                     const rated = reviews.filter(r => r.rating > 0);
                     if (rated.length > 0) {
