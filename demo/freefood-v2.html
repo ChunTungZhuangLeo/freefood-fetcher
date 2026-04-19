@@ -2694,6 +2694,37 @@ freefood = ara.<span class="function">Automation</span>(
             el.classList.toggle('selected');
         }
 
+        // Use localStorage when running on static hosting (GitHub Pages, file://)
+        const USE_LOCAL_STORAGE = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+        const LS_KEY = 'freefood_reviews';
+
+        function lsGetAll() {
+            try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
+        }
+        function lsGetForEvent(eventId) {
+            return lsGetAll().filter(r => String(r.event_id) === String(eventId));
+        }
+        function lsAddReview(data) {
+            const all = lsGetAll();
+            const review = {
+                id: 'ls_' + Date.now(),
+                event_id: String(data.event_id),
+                author: data.author || 'Anonymous',
+                rating: data.rating || 0,
+                text: data.text || '',
+                tags: data.tags || [],
+                created_at: new Date().toISOString(),
+                timeAgo: 'just now'
+            };
+            all.unshift(review);
+            localStorage.setItem(LS_KEY, JSON.stringify(all));
+            return review;
+        }
+        function lsDeleteReview(reviewId) {
+            const all = lsGetAll().filter(r => r.id !== reviewId);
+            localStorage.setItem(LS_KEY, JSON.stringify(all));
+        }
+
         async function submitReview() {
             const text = document.getElementById('reviewText').value.trim();
             const author = document.getElementById('reviewAuthor').value.trim() || 'Anonymous';
@@ -2708,28 +2739,23 @@ freefood = ara.<span class="function">Automation</span>(
             btn.textContent = 'Submitting...';
             btn.disabled = true;
 
-            const apiBase = `${window.location.origin}`;
-
             try {
-                const res = await fetch(`${apiBase}/api/reviews`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        event_id: String(currentReviewEventId),
-                        author,
-                        rating: currentRating,
-                        text,
-                        tags
-                    })
-                });
-
-                if (!res.ok) {
-                    const errBody = await res.text();
-                    throw new Error(`Server ${res.status}: ${errBody}`);
+                let saved;
+                if (USE_LOCAL_STORAGE) {
+                    saved = lsAddReview({ event_id: currentReviewEventId, author, rating: currentRating, text, tags });
+                } else {
+                    const res = await fetch(`${window.location.origin}/api/reviews`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ event_id: String(currentReviewEventId), author, rating: currentRating, text, tags })
+                    });
+                    if (!res.ok) {
+                        const errBody = await res.text();
+                        throw new Error(`Server ${res.status}: ${errBody}`);
+                    }
+                    saved = await res.json();
                 }
-                const saved = await res.json();
 
-                // Update event in memory immediately
                 const ev = events.find(e => e.id === currentReviewEventId);
                 if (ev) {
                     if (!ev.reviewsList) ev.reviewsList = [];
@@ -2754,6 +2780,7 @@ freefood = ara.<span class="function">Automation</span>(
         }
 
         async function loadReviewsForEvent(eventId) {
+            if (USE_LOCAL_STORAGE) return lsGetForEvent(eventId);
             try {
                 const res = await fetch(`${window.location.origin}/api/reviews/${eventId}`);
                 if (!res.ok) return [];
@@ -2764,8 +2791,12 @@ freefood = ara.<span class="function">Automation</span>(
         async function deleteReview(reviewId, eventId) {
             if (!confirm('Delete this review?')) return;
             try {
-                const res = await fetch(`${window.location.origin}/api/reviews/${reviewId}`, { method: 'DELETE' });
-                if (!res.ok) throw new Error(`Server ${res.status}`);
+                if (USE_LOCAL_STORAGE) {
+                    lsDeleteReview(reviewId);
+                } else {
+                    const res = await fetch(`${window.location.origin}/api/reviews/${reviewId}`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error(`Server ${res.status}`);
+                }
                 const ev = events.find(e => e.id === eventId);
                 if (ev) {
                     ev.reviewsList = (ev.reviewsList || []).filter(r => r.id !== reviewId);
