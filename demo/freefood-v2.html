@@ -2564,7 +2564,7 @@ freefood = ara.<span class="function">Automation</span>(
                                     <div class="review-header">
                                         <span class="review-author">${r.author}</span>
                                         <span class="review-time">${r.timeAgo}</span>
-                                        ${r.id ? `<button class="review-delete-btn" onclick="event.stopPropagation(); deleteReview(${r.id}, ${event.id})" title="Delete review">✕</button>` : ''}
+                                        ${r.id ? `<button class="review-delete-btn" onclick="event.stopPropagation(); deleteReview('${r.id}', ${event.id})" title="Delete review">✕</button>` : ''}
                                     </div>
                                     <div class="review-text">${r.text}</div>
                                     ${r.images ? `<div class="review-images">${r.images.map(img => `<div class="review-image">${img}</div>`).join('')}</div>` : ''}
