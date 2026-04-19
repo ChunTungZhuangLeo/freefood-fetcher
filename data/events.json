@@ -74,6 +74,23 @@
       "rating": 4.2
     },
     {
+      "id": 5,
+      "title": "HUSAM Professor Talks for AMS Research",
+      "location": "Hackerman B17",
+      "time": "April 16, 2026 6:00 PM",
+      "food": "Food provided at this research talk event",
+      "confidence": 95,
+      "source": "jhu.campusgroups.com",
+      "isPublic": false,
+      "isPast": true,
+      "signals": ["food will be provided"],
+      "speaker": "Dr. Mauro Maggioni & Dr. Luana Ruiz",
+      "topic": "AMS Department Research Projects",
+      "reviewsList": [],
+      "reviews": 0,
+      "rating": 0
+    },
+    {
       "id": 4,
       "title": "ACM Club Social",
       "location": "Hackerman Hall B17",
@@ -102,8 +119,8 @@
       "rating": 4.5
     }
   ],
-  "total_scanned": 23,
-  "food_found": 4,
+  "total_scanned": 24,
+  "food_found": 5,
   "status": "completed",
-  "message": "Real scan from Ara - found 4 events with free food (2 upcoming, 2 past)"
+  "message": "Real scan from Ara - found 5 events with free food (2 upcoming, 3 past)"
 }
