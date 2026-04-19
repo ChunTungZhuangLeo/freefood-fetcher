@@ -320,6 +320,248 @@
         .legend-dot.private { background: var(--info); }
         .legend-dot.hot { background: var(--primary); }
 
+        /* Ping System */
+        .ping-toolbar {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 500;
+            display: flex;
+            gap: 8px;
+            background: var(--cream-light);
+            padding: 10px 15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border: 1px solid var(--border);
+        }
+
+        .ping-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ping-btn img {
+            width: 35px;
+            height: 35px;
+            object-fit: contain;
+        }
+
+        .ping-btn:hover {
+            transform: scale(1.15);
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(212,165,52,0.3);
+        }
+
+        .ping-btn.active {
+            border-color: var(--primary);
+            background: rgba(212,165,52,0.1);
+        }
+
+        .ping-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .ping-btn .ping-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            white-space: nowrap;
+            color: var(--charcoal);
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .ping-btn:hover .ping-label {
+            opacity: 1;
+        }
+
+        .ping-counter {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ping-rate-limit {
+            font-size: 0.75rem;
+            color: var(--charcoal-light);
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Ping Marker on Map */
+        .ping-marker {
+            animation: pingPulse 2s ease-out forwards;
+        }
+
+        @keyframes pingPulse {
+            0% { transform: scale(0); opacity: 0; }
+            20% { transform: scale(1.3); opacity: 1; }
+            40% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        .ping-marker-permanent {
+            animation: pingBounce 0.5s ease-out;
+        }
+
+        @keyframes pingBounce {
+            0% { transform: scale(0) translateY(-20px); }
+            60% { transform: scale(1.2) translateY(0); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
+        /* Ping Ripple Effect */
+        .ping-ripple {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid;
+            animation: ripple 1.5s ease-out infinite;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .ping-ripple.assist { border-color: #00ff88; }
+        .ping-ripple.omw { border-color: #00d4ff; }
+        .ping-ripple.danger { border-color: #ff4444; }
+        .ping-ripple.missing { border-color: #ffaa00; }
+
+        /* Ping Feed */
+        .ping-feed {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            z-index: 500;
+            width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .ping-feed-item {
+            background: var(--cream-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .ping-feed-icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        .ping-feed-content {
+            flex: 1;
+        }
+
+        .ping-feed-user {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--charcoal);
+        }
+
+        .ping-feed-text {
+            font-size: 0.75rem;
+            color: var(--charcoal-light);
+        }
+
+        .ping-feed-time {
+            font-size: 0.7rem;
+            color: var(--charcoal-light);
+        }
+
+        /* Invite Modal */
+        .invite-modal {
+            max-width: 450px;
+        }
+
+        .invite-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: var(--charcoal);
+        }
+
+        .invite-input::placeholder { color: #999; }
+
+        .invite-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: var(--success);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .invite-btn:hover { background: #4a8a4a; }
+
+        .invite-preview {
+            background: var(--cream-dark);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        .invite-preview-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--charcoal);
+        }
+
+        .invite-preview-text {
+            color: var(--charcoal-light);
+            line-height: 1.5;
+        }
+
         /* Events Panel */
         .events-panel {
             background: var(--cream-light);
@@ -1389,6 +1631,30 @@
                     <span>Happening Now 🔥</span>
                 </div>
             </div>
+
+            <!-- Ping Toolbar -->
+            <div class="ping-toolbar">
+                <div class="ping-rate-limit" id="pingRateLimit">3/3</div>
+                <button class="ping-btn" onclick="selectPing('assist')" id="pingAssist" title="Assist - Need backup!">
+                    <img src="LoL_ping_assist.png" alt="Assist" onerror="this.parentElement.innerHTML='🆘'">
+                    <span class="ping-label">Assist</span>
+                </button>
+                <button class="ping-btn" onclick="selectPing('omw')" id="pingOmw" title="On My Way">
+                    <img src="LoL_ping_OMW.png" alt="OMW" onerror="this.parentElement.innerHTML='🏃'">
+                    <span class="ping-label">OMW</span>
+                </button>
+                <button class="ping-btn" onclick="selectPing('danger')" id="pingDanger" title="Danger - Food running out!">
+                    <img src="LoL_ping_danger.png" alt="Danger" onerror="this.parentElement.innerHTML='⚠️'">
+                    <span class="ping-label">Danger</span>
+                </button>
+                <button class="ping-btn" onclick="selectPing('missing')" id="pingMissing" title="Missing - Event cancelled?">
+                    <img src="LoL_ping_missing.png" alt="Missing" onerror="this.parentElement.innerHTML='❓'">
+                    <span class="ping-label">Missing</span>
+                </button>
+            </div>
+
+            <!-- Ping Feed -->
+            <div class="ping-feed" id="pingFeed"></div>
         </div>
 
         <!-- Events Panel -->
@@ -1476,6 +1742,29 @@
             <button class="submit-review-btn" onclick="submitReview()">
                 Submit Review (+10 XP)
             </button>
+        </div>
+    </div>
+
+    <!-- Invite Modal (for Assist Pings) -->
+    <div class="modal-overlay" id="inviteModal">
+        <div class="modal invite-modal">
+            <div class="modal-logo">🆘</div>
+            <div class="modal-title">Call for Backup!</div>
+            <div class="modal-desc">Invite friends to join you at this food event</div>
+
+            <input type="email" class="invite-input" id="inviteEmail" placeholder="Enter email address...">
+
+            <div class="invite-preview">
+                <div class="invite-preview-title">📧 Email Preview:</div>
+                <div class="invite-preview-text">
+                    "Hey! <span id="inviteUserName">Your friend</span> needs backup at <span id="inviteLocation">an event</span>!
+                    Free food is available but going fast. Join them now on OnlyFood!"
+                </div>
+            </div>
+
+            <button class="invite-btn" onclick="sendInvite()">📤 Send Invite</button>
+
+            <button class="guest-btn" style="margin-top: 10px;" onclick="closeInviteModal()">Skip & Just Ping</button>
         </div>
     </div>
 
@@ -1827,6 +2116,20 @@ freefood = ara.<span class="function">Automation</span>(
         // State
         let isLoggedIn = false;
         let currentRating = 0;
+
+        // Ping System State
+        let selectedPing = null;
+        let pingsRemaining = 3;
+        let pingCooldown = false;
+        let pingMarkers = [];
+        let pendingPingLocation = null;
+
+        const pingTypes = {
+            assist: { emoji: '🆘', color: '#00ff88', label: 'Assist', message: 'needs backup!' },
+            omw: { emoji: '🏃', color: '#00d4ff', label: 'OMW', message: 'is on their way!' },
+            danger: { emoji: '⚠️', color: '#ff4444', label: 'Danger', message: 'warns: food running out!' },
+            missing: { emoji: '❓', color: '#ffaa00', label: 'Missing', message: 'reports: event may be cancelled' }
+        };
 
         // Events data - populated from real Ara scans
         const events = [];  // Starts empty, filled with real data from data/events.json
@@ -2291,6 +2594,240 @@ freefood = ara.<span class="function">Automation</span>(
                 if (e.target === overlay) overlay.classList.remove('show');
             });
         });
+
+        // ============ PING SYSTEM ============
+
+        function selectPing(type) {
+            if (pingsRemaining <= 0) {
+                showToast('⏳ Rate limited! Wait for cooldown...');
+                return;
+            }
+
+            // Toggle selection
+            if (selectedPing === type) {
+                selectedPing = null;
+                document.querySelectorAll('.ping-btn').forEach(btn => btn.classList.remove('active'));
+                map.getContainer().style.cursor = '';
+                return;
+            }
+
+            selectedPing = type;
+            document.querySelectorAll('.ping-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('ping' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+
+            // Change cursor to crosshair
+            map.getContainer().style.cursor = 'crosshair';
+
+            showToast(`🎯 Click on the map to place ${pingTypes[type].label} ping`);
+        }
+
+        // Map click handler for pings
+        map.on('click', function(e) {
+            if (!selectedPing) return;
+            if (pingsRemaining <= 0) {
+                showToast('⏳ Rate limited! Wait for cooldown...');
+                return;
+            }
+
+            const pingType = selectedPing;
+            const latlng = e.latlng;
+
+            // For Assist ping, show invite modal first
+            if (pingType === 'assist') {
+                pendingPingLocation = latlng;
+                showInviteModal(latlng);
+                return;
+            }
+
+            // Place the ping
+            placePing(pingType, latlng);
+        });
+
+        function placePing(type, latlng, skipCooldown = false) {
+            const ping = pingTypes[type];
+
+            // Create ping marker
+            const pingIcon = L.divIcon({
+                html: `
+                    <div class="ping-marker-permanent" style="position: relative;">
+                        <div class="ping-ripple ${type}"></div>
+                        <div style="
+                            width: 45px; height: 45px;
+                            background: ${ping.color};
+                            border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 1.5rem;
+                            box-shadow: 0 4px 15px ${ping.color}66;
+                            border: 3px solid white;
+                            position: relative;
+                            z-index: 10;
+                        ">${ping.emoji}</div>
+                    </div>
+                `,
+                iconSize: [45, 45],
+                iconAnchor: [22, 22],
+                className: 'ping-marker-container'
+            });
+
+            const marker = L.marker(latlng, { icon: pingIcon }).addTo(map);
+            pingMarkers.push(marker);
+
+            // Add to feed
+            addPingToFeed(type, latlng);
+
+            // Remove ping after 30 seconds
+            setTimeout(() => {
+                map.removeLayer(marker);
+                pingMarkers = pingMarkers.filter(m => m !== marker);
+            }, 30000);
+
+            // Update rate limit
+            if (!skipCooldown) {
+                pingsRemaining--;
+                updatePingRateLimit();
+
+                // Reset one ping after 20 seconds
+                setTimeout(() => {
+                    if (pingsRemaining < 3) {
+                        pingsRemaining++;
+                        updatePingRateLimit();
+                    }
+                }, 20000);
+            }
+
+            // Clear selection
+            selectedPing = null;
+            document.querySelectorAll('.ping-btn').forEach(btn => btn.classList.remove('active'));
+            map.getContainer().style.cursor = '';
+
+            showToast(`${ping.emoji} ${ping.label} ping placed!`);
+        }
+
+        function updatePingRateLimit() {
+            const el = document.getElementById('pingRateLimit');
+            el.textContent = `${pingsRemaining}/3`;
+            el.style.color = pingsRemaining === 0 ? '#ff4444' : 'var(--charcoal-light)';
+
+            // Disable buttons if no pings left
+            document.querySelectorAll('.ping-btn').forEach(btn => {
+                if (pingsRemaining <= 0) {
+                    btn.classList.add('disabled');
+                } else {
+                    btn.classList.remove('disabled');
+                }
+            });
+        }
+
+        function addPingToFeed(type, latlng) {
+            const ping = pingTypes[type];
+            const feed = document.getElementById('pingFeed');
+            const userName = isLoggedIn ? 'Leo Z' : 'Anonymous';
+
+            const item = document.createElement('div');
+            item.className = 'ping-feed-item';
+            item.innerHTML = `
+                <img src="LoL_ping_${type === 'omw' ? 'OMW' : type}.png" class="ping-feed-icon"
+                     onerror="this.outerHTML='<span style=\\'font-size:1.5rem;\\'>${ping.emoji}</span>'">
+                <div class="ping-feed-content">
+                    <div class="ping-feed-user">${userName}</div>
+                    <div class="ping-feed-text">${ping.message}</div>
+                </div>
+                <div class="ping-feed-time">now</div>
+            `;
+
+            // Click to fly to location
+            item.style.cursor = 'pointer';
+            item.onclick = () => map.flyTo(latlng, 17);
+
+            feed.insertBefore(item, feed.firstChild);
+
+            // Keep only last 5 pings in feed
+            while (feed.children.length > 5) {
+                feed.removeChild(feed.lastChild);
+            }
+
+            // Auto-remove after 30 seconds
+            setTimeout(() => {
+                if (item.parentElement) {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(100px)';
+                    setTimeout(() => item.remove(), 300);
+                }
+            }, 30000);
+        }
+
+        // Invite Modal Functions
+        function showInviteModal(latlng) {
+            document.getElementById('inviteUserName').textContent = isLoggedIn ? 'Leo' : 'Someone';
+            document.getElementById('inviteLocation').textContent = 'a free food event';
+            document.getElementById('inviteModal').classList.add('show');
+        }
+
+        function closeInviteModal() {
+            document.getElementById('inviteModal').classList.remove('show');
+            if (pendingPingLocation) {
+                placePing('assist', pendingPingLocation);
+                pendingPingLocation = null;
+            }
+        }
+
+        function sendInvite() {
+            const email = document.getElementById('inviteEmail').value;
+            if (!email || !email.includes('@')) {
+                showToast('📧 Please enter a valid email');
+                return;
+            }
+
+            // Simulate sending email
+            showToast(`📧 Invite sent to ${email}!`);
+            document.getElementById('inviteEmail').value = '';
+            document.getElementById('inviteModal').classList.remove('show');
+
+            if (pendingPingLocation) {
+                placePing('assist', pendingPingLocation);
+                pendingPingLocation = null;
+            }
+        }
+
+        // Add some sample pings on load for demo
+        setTimeout(() => {
+            // Demo ping from another user
+            const demoPing = L.divIcon({
+                html: `
+                    <div style="position: relative;">
+                        <div class="ping-ripple omw"></div>
+                        <div style="
+                            width: 40px; height: 40px;
+                            background: #00d4ff;
+                            border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 1.3rem;
+                            box-shadow: 0 4px 15px #00d4ff66;
+                            border: 3px solid white;
+                        ">🏃</div>
+                    </div>
+                `,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+            const demoMarker = L.marker([39.3280, -76.6210], { icon: demoPing }).addTo(map);
+
+            // Add to feed
+            const feed = document.getElementById('pingFeed');
+            const item = document.createElement('div');
+            item.className = 'ping-feed-item';
+            item.innerHTML = `
+                <span style="font-size:1.5rem;">🏃</span>
+                <div class="ping-feed-content">
+                    <div class="ping-feed-user">Alex M.</div>
+                    <div class="ping-feed-text">is on their way!</div>
+                </div>
+                <div class="ping-feed-time">2m ago</div>
+            `;
+            item.style.cursor = 'pointer';
+            item.onclick = () => map.flyTo([39.3280, -76.6210], 17);
+            feed.appendChild(item);
+        }, 2000);
     </script>
 </body>
 </html>
