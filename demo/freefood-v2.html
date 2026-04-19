@@ -1712,8 +1712,6 @@
         </a>
         <div class="nav-links">
             <a class="nav-link active" onclick="showTab('map')">Map</a>
-            <a class="nav-link" onclick="showTab('events')">Events</a>
-            <a class="nav-link" onclick="showTab('leaderboard')">Leaderboard</a>
             <a class="nav-link ara-nav" onclick="showAraModal()" style="background: linear-gradient(90deg, #6366f1, #8b5cf6); padding: 6px 14px; border-radius: 15px; color: white;">⚡ Ara</a>
         </div>
         <div class="nav-right">
@@ -1871,19 +1869,19 @@
             <!-- Ping Toolbar -->
             <div class="ping-toolbar">
                 <div class="ping-rate-limit" id="pingRateLimit">3/3</div>
-                <button class="ping-btn" onclick="selectPing('assist')" id="pingAssist" title="Assist - Need backup!">
+                <button class="ping-btn" onclick="selectPing('assist')" id="pingAssist" title="Call for backup! Let friends know you need help getting food.">
                     <img src="LoL_ping_assist.png" alt="Assist" onerror="this.parentElement.innerHTML='🆘'">
                     <span class="ping-label">Assist</span>
                 </button>
-                <button class="ping-btn" onclick="selectPing('omw')" id="pingOmw" title="On My Way">
+                <button class="ping-btn" onclick="selectPing('omw')" id="pingOmw" title="On my way! Let others know you're heading to the food.">
                     <img src="LoL_ping_OMW.png" alt="OMW" onerror="this.parentElement.innerHTML='🏃'">
                     <span class="ping-label">OMW</span>
                 </button>
-                <button class="ping-btn" onclick="selectPing('danger')" id="pingDanger" title="Danger - Food running out!">
+                <button class="ping-btn" onclick="selectPing('danger')" id="pingDanger" title="Danger! Food is running out fast, hurry up!">
                     <img src="LoL_ping_danger.png" alt="Danger" onerror="this.parentElement.innerHTML='⚠️'">
                     <span class="ping-label">Danger</span>
                 </button>
-                <button class="ping-btn" onclick="selectPing('missing')" id="pingMissing" title="Missing - Event cancelled?">
+                <button class="ping-btn" onclick="selectPing('missing')" id="pingMissing" title="Missing! Event might be cancelled or no food found.">
                     <img src="LoL_ping_missing.png" alt="Missing" onerror="this.parentElement.innerHTML='❓'">
                     <span class="ping-label">Missing</span>
                 </button>
@@ -3002,7 +3000,7 @@ freefood = ara.<span class="function">Automation</span>(
             // Change cursor to crosshair
             map.getContainer().style.cursor = 'crosshair';
 
-            showToast(`🎯 Click on the map to place ${pingTypes[type].label} ping`);
+            showToast(`Place ${pingTypes[type].label} Ping`);
         }
 
         // Map click handler for pings
@@ -3030,26 +3028,24 @@ freefood = ara.<span class="function">Automation</span>(
         function placePing(type, latlng, skipCooldown = false) {
             const ping = pingTypes[type];
 
-            // Create ping marker
+            // Get correct image filename
+            const imgName = type === 'omw' ? 'LoL_ping_OMW.png' : `LoL_ping_${type}.png`;
+
+            // Create ping marker with LoL image
             const pingIcon = L.divIcon({
                 html: `
                     <div class="ping-marker-permanent" style="position: relative;">
                         <div class="ping-ripple ${type}"></div>
-                        <div style="
-                            width: 45px; height: 45px;
-                            background: ${ping.color};
-                            border-radius: 50%;
-                            display: flex; align-items: center; justify-content: center;
-                            font-size: 1.5rem;
-                            box-shadow: 0 4px 15px ${ping.color}66;
-                            border: 3px solid white;
+                        <img src="${imgName}" alt="${ping.label}" style="
+                            width: 50px; height: 50px;
+                            filter: drop-shadow(0 4px 8px ${ping.color}88);
                             position: relative;
                             z-index: 10;
-                        ">${ping.emoji}</div>
+                        " onerror="this.outerHTML='<div style=\\'width:45px;height:45px;background:${ping.color};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 4px 15px ${ping.color}66;border:3px solid white;\\'>${ping.emoji}</div>'">
                     </div>
                 `,
-                iconSize: [45, 45],
-                iconAnchor: [22, 22],
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
                 className: 'ping-marker-container'
             });
 
@@ -3180,19 +3176,14 @@ freefood = ara.<span class="function">Automation</span>(
                 html: `
                     <div style="position: relative;">
                         <div class="ping-ripple omw"></div>
-                        <div style="
-                            width: 40px; height: 40px;
-                            background: #00d4ff;
-                            border-radius: 50%;
-                            display: flex; align-items: center; justify-content: center;
-                            font-size: 1.3rem;
-                            box-shadow: 0 4px 15px #00d4ff66;
-                            border: 3px solid white;
-                        ">🏃</div>
+                        <img src="LoL_ping_OMW.png" alt="OMW" style="
+                            width: 45px; height: 45px;
+                            filter: drop-shadow(0 4px 8px #00d4ff88);
+                        " onerror="this.outerHTML='<div style=\\'width:40px;height:40px;background:#00d4ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;\\'>🏃</div>'">
                     </div>
                 `,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20]
+                iconSize: [45, 45],
+                iconAnchor: [22, 22]
             });
             const demoMarker = L.marker([39.3280, -76.6210], { icon: demoPing }).addTo(map);
 

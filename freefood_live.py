@@ -118,12 +118,30 @@ IMPORTANT:
 - Don't make up events - be real
 - If you cannot access a URL, include it in an "errors" array
 - confidence should be 0-100 based on food signals found
+
+## EMAIL NOTIFICATIONS
+After finding ANY food events, send an EMAIL to z2750418749@gmail.com
+
+Subject: "🍕 Free Food Alert - [Event Name]"
+
+Body:
+"🍕 FREE FOOD ALERT!
+
+📍 Event: [Event Name]
+📍 Location: [Location]
+🕐 Time: [Time]
+🍽️ Food: [Food type]
+📊 Confidence: [confidence]%
+
+Found by OnlyFood - Powered by Ara"
+
+This is important - always email when you find good food events!
 """,
     tools=[
         get_current_time,
         analyze_for_food
     ],
-    allow_connector_tools=True,  # This lets Ara use web browsing!
+    allow_connector_tools=True,  # This lets Ara use SMS, web browsing, etc!
 )
 
 
@@ -141,7 +159,7 @@ if __name__ == "__main__":
 ║  1. Browse hub.jhu.edu/events/                                            ║
 ║  2. Browse studentaffairs.jhu.edu/calendar/                               ║
 ║  3. Look for events with free food                                        ║
-║  4. Report back what it finds                                             ║
+║  4. EMAIL YOU when it finds something!                                    ║
 ║                                                                           ║
 ║  This is REAL web browsing by Ara's AI agent!                             ║
 ║                                                                           ║
