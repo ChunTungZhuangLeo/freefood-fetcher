@@ -2747,12 +2747,16 @@ freefood = ara.<span class="function">Automation</span>(
                         time: realEvent.time,
                         food: realEvent.food,
                         score: realEvent.confidence,
-                        rating: 0,
-                        reviews: 0,
+                        rating: realEvent.rating || 0,
+                        reviews: realEvent.reviews || 0,
                         isPublic: realEvent.isPublic !== false,
-                        isHot: realEvent.confidence >= 90,
+                        isPast: realEvent.isPast || false,
+                        isHot: !realEvent.isPast && realEvent.confidence >= 90,
                         photos: ['🍕'],
                         tags: realEvent.signals || [],
+                        speaker: realEvent.speaker || null,
+                        topic: realEvent.topic || null,
+                        reviewsList: realEvent.reviewsList || [],
                         isReal: true
                     });
                 });

@@ -81,7 +81,7 @@
       "food": "Food provided at this research talk event",
       "confidence": 95,
       "source": "jhu.campusgroups.com",
-      "isPublic": false,
+      "isPublic": true,
       "isPast": true,
       "signals": ["food will be provided"],
       "speaker": "Dr. Mauro Maggioni & Dr. Luana Ruiz",
