@@ -60,7 +60,8 @@
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 20px;
+            align-items: center;
         }
 
         .nav-link {
@@ -1250,7 +1251,7 @@
             border-radius: 20px;
             border: 1px solid var(--border);
             background: transparent;
-            color: white;
+            color: var(--charcoal);
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -1758,24 +1759,24 @@
                     <div class="leaderboard-item">
                         <div class="leaderboard-rank gold">1</div>
                         <div class="leaderboard-info">
-                            <div class="leaderboard-name">PizzaHunter99</div>
-                            <div class="leaderboard-title">👑 Campus Food God</div>
+                            <div class="leaderboard-name">Reviewer #3</div>
+                            <div class="leaderboard-title">🍕 40 questions about your pizza</div>
                         </div>
                         <div class="leaderboard-reviews">52</div>
                     </div>
                     <div class="leaderboard-item">
                         <div class="leaderboard-rank silver">2</div>
                         <div class="leaderboard-info">
-                            <div class="leaderboard-name">TacoMaster_JHU</div>
-                            <div class="leaderboard-title">🦁 The Jungle King</div>
+                            <div class="leaderboard-name">Dr. Madooei</div>
+                            <div class="leaderboard-title">🌮 Data structures & tacos</div>
                         </div>
                         <div class="leaderboard-reviews">48</div>
                     </div>
                     <div class="leaderboard-item">
                         <div class="leaderboard-rank bronze">3</div>
                         <div class="leaderboard-info">
-                            <div class="leaderboard-name">SpeedyEats</div>
-                            <div class="leaderboard-title">🏃 Speed Eater</div>
+                            <div class="leaderboard-name">Leo Z</div>
+                            <div class="leaderboard-title">🎮 Hungry for tokens, jungler</div>
                         </div>
                         <div class="leaderboard-reviews">41</div>
                     </div>
@@ -1841,6 +1842,27 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Add Event Button -->
+            <button onclick="showAddEventModal()" style="
+                width: 100%;
+                padding: 15px;
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                border: none;
+                border-radius: 12px;
+                color: white;
+                font-weight: 600;
+                font-size: 0.95rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                margin-top: 15px;
+                transition: transform 0.2s, box-shadow 0.2s;
+            " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 15px rgba(212,165,52,0.4)';" onmouseout="this.style.transform='none';this.style.boxShadow='none';">
+                ➕ Report Free Food
+            </button>
         </div>
 
         <!-- Map -->
@@ -1884,6 +1906,11 @@
                 <button class="ping-btn" onclick="selectPing('missing')" id="pingMissing" title="Missing! Event might be cancelled or no food found.">
                     <img src="LoL_ping_missing.png" alt="Missing" onerror="this.parentElement.innerHTML='❓'">
                     <span class="ping-label">Missing</span>
+                </button>
+                <div style="width: 1px; height: 30px; background: var(--border); margin: 0 5px;"></div>
+                <button class="ping-btn" onclick="clearAllPings()" id="pingClear" title="Clear all your pings from the map" style="background: #ffeeee;">
+                    🗑️
+                    <span class="ping-label">Clear</span>
                 </button>
             </div>
 
@@ -2068,6 +2095,25 @@
             </div>
 
             <button class="guest-btn" style="margin-top: 20px;" onclick="closeBountyModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal-overlay" id="addEventModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-logo">🍕</div>
+            <div class="modal-title">Report Free Food</div>
+            <div class="modal-desc">Found free food on campus? Let everyone know!</div>
+
+            <input type="text" id="newEventTitle" class="invite-input" placeholder="Event name (e.g., CS Club Meeting)" style="margin-top: 20px;">
+            <input type="text" id="newEventLocation" class="invite-input" placeholder="Location (e.g., Malone Hall 228)">
+            <input type="text" id="newEventFood" class="invite-input" placeholder="What food? (e.g., Pizza, Chipotle, Cookies)">
+            <input type="text" id="newEventTime" class="invite-input" placeholder="Time (e.g., Today 5:00 PM)">
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="invite-btn" onclick="submitNewEvent()" style="flex: 1;">🚀 Submit</button>
+                <button class="guest-btn" onclick="closeAddEventModal()" style="flex: 0.5;">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -2526,7 +2572,7 @@ freefood = ara.<span class="function">Automation</span>(
                     <div class="event-food">"${event.food}"</div>
                     ${reviewsHtml}
                     <div class="event-photos">
-                        ${(event.photos || ['🍕']).slice(0, 3).map(p => `<div class="event-photo">${p}</div>`).join('')}
+                        ${(event.photos || [event.foodEmoji || '🍕']).slice(0, 3).map(p => `<div class="event-photo">${p}</div>`).join('')}
                         ${(event.photos || []).length > 3 ? `<div class="event-photo more">+${event.photos.length - 3}</div>` : ''}
                     </div>
                     <div class="event-tags">
@@ -2826,8 +2872,9 @@ freefood = ara.<span class="function">Automation</span>(
                         reviews: realEvent.reviews || 0,
                         isPublic: realEvent.isPublic !== false,
                         isPast: realEvent.isPast || false,
-                        isHot: !realEvent.isPast && realEvent.confidence >= 90,
-                        photos: ['🍕'],
+                        isHot: realEvent.isHot || (!realEvent.isPast && realEvent.confidence >= 90),
+                        photos: [realEvent.foodEmoji || '🍕'],
+                        foodEmoji: realEvent.foodEmoji || '🍕',
                         tags: realEvent.signals || [],
                         speaker: realEvent.speaker || null,
                         topic: realEvent.topic || null,
@@ -3094,13 +3141,30 @@ freefood = ara.<span class="function">Automation</span>(
             el.style.color = pingsRemaining === 0 ? '#ff4444' : 'var(--charcoal-light)';
 
             // Disable buttons if no pings left
-            document.querySelectorAll('.ping-btn').forEach(btn => {
+            document.querySelectorAll('.ping-btn:not(#pingClear)').forEach(btn => {
                 if (pingsRemaining <= 0) {
                     btn.classList.add('disabled');
                 } else {
                     btn.classList.remove('disabled');
                 }
             });
+        }
+
+        function clearAllPings() {
+            // Remove all ping markers from map
+            pingMarkers.forEach(marker => {
+                map.removeLayer(marker);
+            });
+            pingMarkers = [];
+
+            // Clear ping feed
+            document.getElementById('pingFeed').innerHTML = '';
+
+            // Reset rate limit
+            pingsRemaining = 3;
+            updatePingRateLimit();
+
+            showToast('🗑️ All pings cleared!');
         }
 
         function addPingToFeed(type, latlng) {
@@ -3312,6 +3376,75 @@ freefood = ara.<span class="function">Automation</span>(
         function closeBountyModal() {
             document.getElementById('bountyModal').classList.remove('show');
         }
+
+        // ============ ADD EVENT ============
+        function showAddEventModal() {
+            document.getElementById('addEventModal').classList.add('show');
+        }
+
+        function closeAddEventModal() {
+            document.getElementById('addEventModal').classList.remove('show');
+        }
+
+        function submitNewEvent() {
+            const title = document.getElementById('newEventTitle').value.trim();
+            const location = document.getElementById('newEventLocation').value.trim();
+            const food = document.getElementById('newEventFood').value.trim();
+            const time = document.getElementById('newEventTime').value.trim();
+
+            if (!title || !location || !food) {
+                showToast('Please fill in event name, location, and food!');
+                return;
+            }
+
+            // Determine food emoji based on food description
+            let foodEmoji = '🍕';
+            const foodLower = food.toLowerCase();
+            if (foodLower.includes('chipotle') || foodLower.includes('burrito') || foodLower.includes('taco')) foodEmoji = '🌯';
+            else if (foodLower.includes('sushi')) foodEmoji = '🍣';
+            else if (foodLower.includes('cookie')) foodEmoji = '🍪';
+            else if (foodLower.includes('coffee') || foodLower.includes('pastry')) foodEmoji = '🥐';
+            else if (foodLower.includes('salad')) foodEmoji = '🥗';
+            else if (foodLower.includes('sandwich') || foodLower.includes('sub')) foodEmoji = '🥪';
+            else if (foodLower.includes('burger')) foodEmoji = '🍔';
+            else if (foodLower.includes('noodle') || foodLower.includes('ramen')) foodEmoji = '🍜';
+
+            // Add to events
+            const newEvent = {
+                id: Date.now(),
+                title: title,
+                location: location,
+                coords: getLocationCoords(location),
+                time: time || 'Now',
+                food: food,
+                score: 90,
+                rating: 0,
+                reviews: 0,
+                isPublic: true,
+                isHot: true,
+                photos: [foodEmoji],
+                foodEmoji: foodEmoji,
+                tags: ['user reported'],
+                isReal: true
+            };
+
+            events.unshift(newEvent);
+            renderEvents();
+
+            // Clear form and close
+            document.getElementById('newEventTitle').value = '';
+            document.getElementById('newEventLocation').value = '';
+            document.getElementById('newEventFood').value = '';
+            document.getElementById('newEventTime').value = '';
+            closeAddEventModal();
+
+            showToast(`🎉 "${title}" added! +15 XP`);
+        }
+
+        // Close add event modal on overlay click
+        document.getElementById('addEventModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addEventModal') closeAddEventModal();
+        });
 
         function claimBounty(bountyType) {
             const rewards = {

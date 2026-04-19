@@ -7,6 +7,29 @@
   ],
   "events": [
     {
+      "id": 0,
+      "title": "Ara x JHU Hackathon",
+      "location": "Pava Center",
+      "time": "April 19, 2026 10:00 AM",
+      "food": "Catered lunch and dinner, snacks all day!",
+      "confidence": 100,
+      "source": "ara.so",
+      "isPublic": true,
+      "isHot": true,
+      "signals": ["catered", "free food", "lunch provided", "dinner provided"],
+      "foodEmoji": "🍱",
+      "reviewsList": [
+        {
+          "author": "Leo Z",
+          "timeAgo": "1h ago",
+          "text": "Building OnlyFood here! Great vibes and unlimited snacks",
+          "images": ["🍱", "💻", "🎮"]
+        }
+      ],
+      "reviews": 5,
+      "rating": 5.0
+    },
+    {
       "id": 1,
       "title": "Johns Hopkins Game Showcase",
       "location": "Hodson Hall",
@@ -16,6 +39,7 @@
       "source": "hub.jhu.edu",
       "isPublic": true,
       "signals": ["free pizza"],
+      "foodEmoji": "🍕",
       "reviewsList": [
         {
           "author": "Alex M.",
@@ -43,6 +67,7 @@
       "source": "cs.jhu.edu",
       "isPublic": false,
       "signals": ["refreshments"],
+      "foodEmoji": "🍪",
       "speaker": "Dr. Sarah Chen",
       "topic": "Machine Learning for Climate Modeling",
       "reviewsList": [],
@@ -60,6 +85,7 @@
       "isPublic": false,
       "isPast": true,
       "signals": ["coffee", "pastries"],
+      "foodEmoji": "🥐",
       "speaker": "Prof. Michael Torres",
       "topic": "Quantum Computing: From Theory to Practice",
       "reviewsList": [
@@ -74,23 +100,6 @@
       "rating": 4.2
     },
     {
-      "id": 5,
-      "title": "HUSAM Professor Talks for AMS Research",
-      "location": "Hackerman B17",
-      "time": "April 16, 2026 6:00 PM",
-      "food": "Food provided at this research talk event",
-      "confidence": 95,
-      "source": "jhu.campusgroups.com",
-      "isPublic": true,
-      "isPast": true,
-      "signals": ["food will be provided"],
-      "speaker": "Dr. Mauro Maggioni & Dr. Luana Ruiz",
-      "topic": "AMS Department Research Projects",
-      "reviewsList": [],
-      "reviews": 0,
-      "rating": 0
-    },
-    {
       "id": 4,
       "title": "ACM Club Social",
       "location": "Hackerman Hall B17",
@@ -101,6 +110,7 @@
       "isPublic": true,
       "isPast": true,
       "signals": ["chipotle", "free food"],
+      "foodEmoji": "🌯",
       "reviewsList": [
         {
           "author": "Taylor R.",
@@ -117,10 +127,28 @@
       ],
       "reviews": 18,
       "rating": 4.5
+    },
+    {
+      "id": 5,
+      "title": "HUSAM Professor Talks for AMS Research",
+      "location": "Hackerman B17",
+      "time": "April 16, 2026 6:00 PM",
+      "food": "Food provided at this research talk event",
+      "confidence": 95,
+      "source": "jhu.campusgroups.com",
+      "isPublic": true,
+      "isPast": true,
+      "signals": ["food will be provided"],
+      "foodEmoji": "🥗",
+      "speaker": "Dr. Mauro Maggioni & Dr. Luana Ruiz",
+      "topic": "AMS Department Research Projects",
+      "reviewsList": [],
+      "reviews": 0,
+      "rating": 0
     }
   ],
-  "total_scanned": 24,
-  "food_found": 5,
+  "total_scanned": 26,
+  "food_found": 6,
   "status": "completed",
-  "message": "Real scan from Ara - found 5 events with free food (2 upcoming, 3 past)"
+  "message": "Real scan from Ara - found 6 events with free food (3 upcoming, 3 past)"
 }
