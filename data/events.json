@@ -1,13 +1,25 @@
 {
-  "scan_time": "2024-04-19T12:00:00Z",
+  "scan_time": "2026-04-19T18:22:07Z",
   "source_urls": [
     "https://hub.jhu.edu/events/",
     "https://studentaffairs.jhu.edu/calendar/",
     "https://www.cs.jhu.edu/news-events/"
   ],
-  "events": [],
-  "total_scanned": 0,
-  "food_found": 0,
-  "status": "awaiting_scan",
-  "message": "Run 'ara run freefood_live.py' to fetch real events"
+  "events": [
+    {
+      "id": 1,
+      "title": "Johns Hopkins Game Showcase",
+      "location": "Hodson Hall",
+      "time": "April 18, 2026",
+      "food": "Enjoy free pizza",
+      "confidence": 95,
+      "source": "hub.jhu.edu",
+      "isPublic": true,
+      "signals": ["free pizza"]
+    }
+  ],
+  "total_scanned": 5,
+  "food_found": 1,
+  "status": "completed",
+  "message": "Real scan from Ara - found 1 event with free food"
 }
