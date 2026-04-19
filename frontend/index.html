@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Personal Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .agent-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .agent-btn {
+            padding: 12px 24px;
+            border: 2px solid #333;
+            background: transparent;
+            color: #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .agent-btn:hover, .agent-btn.active {
+            border-color: #00d9ff;
+            background: rgba(0, 217, 255, 0.1);
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin: 15px 0;
+            padding: 15px 20px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #00d9ff, #00b4d8);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .assistant-message {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #333;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #messageInput:focus {
+            border-color: #00d9ff;
+        }
+
+        #sendBtn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            border: none;
+            border-radius: 25px;
+            color: #1a1a2e;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        #sendBtn:hover {
+            transform: scale(1.05);
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #00d9ff;
+        }
+
+        .feature-desc {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Personal Assistant</h1>
+            <p class="subtitle">Your intelligent companion for daily tasks</p>
+        </header>
+
+        <div class="agent-selector">
+            <button class="agent-btn active" data-agent="general">General</button>
+            <button class="agent-btn" data-agent="study">Study Buddy</button>
+            <button class="agent-btn" data-agent="email">Email Triage</button>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message assistant-message">
+                Hello! I'm your AI personal assistant. How can I help you today?
+            </div>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Type your message..." />
+            <button id="sendBtn">Send</button>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <div class="feature-title">Study Helper</div>
+                <div class="feature-desc">Summarize notes, generate quizzes, explain concepts</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📧</div>
+                <div class="feature-title">Email Manager</div>
+                <div class="feature-desc">Triage inbox, draft replies, extract action items</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">24/7 Assistant</div>
+                <div class="feature-desc">Always available to help with any task</div>
+            </div>
+        </div>
+
+        <footer>
+            Built with Claude AI at Ara x JHU Hackathon 2025
+        </footer>
+    </div>
+
+    <script>
+        let currentAgent = 'general';
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Agent selector
+        document.querySelectorAll('.agent-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.agent-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentAgent = btn.dataset.agent;
+
+                // Clear chat and show agent-specific greeting
+                const greetings = {
+                    'general': "Hello! I'm your general AI assistant. How can I help?",
+                    'study': "Hey! I'm your Study Buddy. Need help with notes, quizzes, or understanding concepts?",
+                    'email': "Hi! I'm your Email Assistant. Paste an email and I'll help you triage or draft a reply."
+                };
+                chatContainer.innerHTML = `<div class="message assistant-message">${greetings[currentAgent]}</div>`;
+            });
+        });
+
+        // Send message
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            chatContainer.innerHTML += `<div class="message user-message">${escapeHtml(message)}</div>`;
+            messageInput.value = '';
+            sendBtn.disabled = true;
+
+            // Add loading indicator
+            const loadingId = Date.now();
+            chatContainer.innerHTML += `<div class="message assistant-message" id="loading-${loadingId}"><div class="loading"></div></div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, agent: currentAgent })
+                });
+
+                const data = await response.json();
+
+                // Remove loading and add response
+                document.getElementById(`loading-${loadingId}`).remove();
+                chatContainer.innerHTML += `<div class="message assistant-message">${escapeHtml(data.response)}</div>`;
+            } catch (error) {
+                document.getElementById(`loading-${loadingId}`).remove();
+                chatContainer.innerHTML += `<div class="message assistant-message">Sorry, something went wrong. Please try again.</div>`;
+            }
+
+            sendBtn.disabled = false;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>

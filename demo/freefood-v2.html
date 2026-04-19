@@ -9,14 +9,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --primary: #ff6b6b;
-            --secondary: #feca57;
-            --success: #00ff88;
-            --info: #00d9ff;
-            --dark: #0a0a15;
-            --darker: #050510;
-            --card: rgba(255,255,255,0.05);
-            --border: rgba(255,255,255,0.1);
+            --primary: #D4A534;
+            --secondary: #B8912D;
+            --success: #5A9A5A;
+            --info: #6B8E9F;
+            --cream: #F5F0E8;
+            --cream-dark: #EDE6D9;
+            --charcoal: #2C2C2C;
+            --dark: #1a1a1f;
+            --darker: #121215;
+            --card: rgba(245,240,232,0.08);
+            --border: rgba(212,165,52,0.2);
         }
 
         body {
@@ -504,6 +507,139 @@
             color: #000;
             font-weight: 600;
         }
+
+        /* Review Summary */
+        .event-reviews-summary {
+            background: rgba(212,165,52,0.08);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .review-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .review-item:last-child { margin-bottom: 0; }
+
+        .review-avatar {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .review-content {
+            flex: 1;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .review-author {
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .review-time {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .review-text {
+            font-size: 0.8rem;
+            color: #bbb;
+            line-height: 1.4;
+        }
+
+        .review-images {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .review-image {
+            width: 40px;
+            height: 40px;
+            background: var(--card);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Speaker Info for Research Events */
+        .event-speaker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(107, 142, 159, 0.1);
+            border-left: 3px solid var(--info);
+            padding: 10px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 10px;
+        }
+
+        .speaker-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--info);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .speaker-info {
+            flex: 1;
+        }
+
+        .speaker-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .speaker-topic {
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        /* Past Event Badge */
+        .event-badge.past {
+            background: rgba(100,100,100,0.3);
+            color: #999;
+        }
+
+        .event-card.past {
+            opacity: 0.7;
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+
+        .back-btn:hover { opacity: 0.8; }
 
         /* Login Modal */
         .modal-overlay {
@@ -1087,8 +1223,9 @@
     <!-- Navigation -->
     <nav class="nav">
         <div class="nav-logo">
-            <span>🍕</span>
-            Free Food Fetcher
+            <a href="index.html" class="back-btn">← Back</a>
+            <span style="margin-left: 15px;">🍕</span>
+            OnlyFood
         </div>
         <div class="nav-links">
             <a class="nav-link active" onclick="showTab('map')">Map</a>
@@ -1124,12 +1261,12 @@
                         <div class="stat-label">Free Food</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="savedToday">$0</div>
-                        <div class="stat-label">Saved Today</div>
+                        <div class="stat-value" id="pastEvents">0</div>
+                        <div class="stat-label">Past 3 Days</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="confidence">--%</div>
-                        <div class="stat-label">Confidence</div>
+                        <div class="stat-value" id="reviewCount">0</div>
+                        <div class="stat-label">Reviews</div>
                     </div>
                 </div>
             </div>
@@ -1717,17 +1854,50 @@ freefood = ara.<span class="function">Automation</span>(
                 if (!event.isPublic && !isLoggedIn) return;
 
                 const card = document.createElement('div');
-                card.className = 'event-card';
+                card.className = 'event-card' + (event.isPast ? ' past' : '');
                 card.onclick = () => selectEvent(event);
 
                 let badgeClass = event.isPublic ? 'public' : 'private';
                 let badgeText = event.isPublic ? '🌐 Public' : '🔒 JHU';
-                if (event.isHot) {
+                if (event.isPast) {
+                    badgeClass = 'past';
+                    badgeText = '📅 Past';
+                } else if (event.isHot) {
                     badgeClass = 'hot';
                     badgeText = '🔥 Now';
                 }
 
-                const realBadge = event.isReal ? '<span class="event-badge" style="background: rgba(0,255,136,0.3); color: var(--success); margin-left: 5px;">✓ REAL</span>' : '';
+                const realBadge = event.isReal ? '<span class="event-badge" style="background: rgba(90,154,90,0.3); color: var(--success); margin-left: 5px;">✓ REAL</span>' : '';
+
+                // Speaker info for research events
+                const speakerHtml = event.speaker ? `
+                    <div class="event-speaker">
+                        <div class="speaker-avatar">🎓</div>
+                        <div class="speaker-info">
+                            <div class="speaker-name">${event.speaker}</div>
+                            <div class="speaker-topic">${event.topic || ''}</div>
+                        </div>
+                    </div>
+                ` : '';
+
+                // Review summaries
+                const reviewsHtml = event.reviewsList && event.reviewsList.length > 0 ? `
+                    <div class="event-reviews-summary">
+                        ${event.reviewsList.slice(0, 2).map(r => `
+                            <div class="review-item">
+                                <div class="review-avatar">${r.author.charAt(0).toUpperCase()}</div>
+                                <div class="review-content">
+                                    <div class="review-header">
+                                        <span class="review-author">${r.author}</span>
+                                        <span class="review-time">${r.timeAgo}</span>
+                                    </div>
+                                    <div class="review-text">${r.text}</div>
+                                    ${r.images ? `<div class="review-images">${r.images.map(img => `<div class="review-image">${img}</div>`).join('')}</div>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '';
 
                 card.innerHTML = `
                     <div class="event-header">
@@ -1739,20 +1909,22 @@ freefood = ara.<span class="function">Automation</span>(
                     <div class="event-meta">
                         <span>📍 ${event.location}</span>
                         <span>🕐 ${event.time}</span>
-                        <span class="event-rating">⭐ ${event.rating} (${event.reviews})</span>
+                        ${event.rating ? `<span class="event-rating">⭐ ${event.rating} (${event.reviews || 0})</span>` : ''}
                     </div>
+                    ${speakerHtml}
                     <div class="event-food">"${event.food}"</div>
+                    ${reviewsHtml}
                     <div class="event-photos">
-                        ${event.photos.slice(0, 3).map(p => `<div class="event-photo">${p}</div>`).join('')}
-                        ${event.photos.length > 3 ? `<div class="event-photo more">+${event.photos.length - 3}</div>` : ''}
+                        ${(event.photos || ['🍕']).slice(0, 3).map(p => `<div class="event-photo">${p}</div>`).join('')}
+                        ${(event.photos || []).length > 3 ? `<div class="event-photo more">+${event.photos.length - 3}</div>` : ''}
                     </div>
                     <div class="event-tags">
-                        ${event.tags.map(t => `<span class="event-tag">${t}</span>`).join('')}
+                        ${(event.tags || []).map(t => `<span class="event-tag">${t}</span>`).join('')}
                     </div>
                     <div class="event-actions">
                         <div class="event-action" onclick="event.stopPropagation(); shareEvent(${event.id})">📤 Share</div>
                         <div class="event-action" onclick="event.stopPropagation(); showReviewModal(${event.id})">✍️ Review</div>
-                        <div class="event-action primary" onclick="event.stopPropagation(); setAlert(${event.id})">🔔 Alert</div>
+                        ${!event.isPast ? `<div class="event-action primary" onclick="event.stopPropagation(); setAlert(${event.id})">🔔 Alert</div>` : ''}
                     </div>
                 `;
                 list.appendChild(card);
@@ -1931,15 +2103,12 @@ freefood = ara.<span class="function">Automation</span>(
             document.getElementById('totalEvents').textContent = araData.total_scanned || 0;
             document.getElementById('freeFood').textContent = araData.food_found || 0;
 
-            // Calculate estimated savings ($12 per meal)
-            const saved = (araData.food_found || 0) * 12;
-            document.getElementById('savedToday').textContent = '$' + saved;
+            // Count past events and reviews
+            const pastCount = araData.events?.filter(e => e.isPast).length || 0;
+            document.getElementById('pastEvents').textContent = pastCount;
 
-            // Show average confidence
-            if (araData.events && araData.events.length > 0) {
-                const avgConf = Math.round(araData.events.reduce((sum, e) => sum + (e.confidence || 0), 0) / araData.events.length);
-                document.getElementById('confidence').textContent = avgConf + '%';
-            }
+            const totalReviews = araData.events?.reduce((sum, e) => sum + (e.reviews || 0), 0) || 0;
+            document.getElementById('reviewCount').textContent = totalReviews;
 
             // Show/hide status message
             if (araData.status === 'awaiting_scan' || !araData.events || araData.events.length === 0) {

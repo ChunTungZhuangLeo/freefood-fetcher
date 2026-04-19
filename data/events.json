@@ -10,16 +10,100 @@
       "id": 1,
       "title": "Johns Hopkins Game Showcase",
       "location": "Hodson Hall",
-      "time": "April 18, 2026",
-      "food": "Enjoy free pizza",
+      "time": "April 18, 2026 6:00 PM",
+      "food": "Enjoy free pizza while playing student-made games",
       "confidence": 95,
       "source": "hub.jhu.edu",
       "isPublic": true,
-      "signals": ["free pizza"]
+      "signals": ["free pizza"],
+      "reviewsList": [
+        {
+          "author": "Alex M.",
+          "timeAgo": "2h ago",
+          "text": "Pizza was amazing! Got there early, still plenty left",
+          "images": ["🍕", "🎮"]
+        },
+        {
+          "author": "Jordan K.",
+          "timeAgo": "3h ago",
+          "text": "Great games and the pizza was hot. Highly recommend!",
+          "images": ["🍕"]
+        }
+      ],
+      "reviews": 12,
+      "rating": 4.8
+    },
+    {
+      "id": 2,
+      "title": "CS Research Colloquium",
+      "location": "Malone Hall 228",
+      "time": "April 19, 2026 4:00 PM",
+      "food": "Refreshments and cookies after the talk",
+      "confidence": 75,
+      "source": "cs.jhu.edu",
+      "isPublic": false,
+      "signals": ["refreshments"],
+      "speaker": "Dr. Sarah Chen",
+      "topic": "Machine Learning for Climate Modeling",
+      "reviewsList": [],
+      "reviews": 0,
+      "rating": 0
+    },
+    {
+      "id": 3,
+      "title": "Physics Department Seminar",
+      "location": "Bloomberg 462",
+      "time": "April 17, 2026 3:30 PM",
+      "food": "Coffee and pastries provided",
+      "confidence": 80,
+      "source": "physics.jhu.edu",
+      "isPublic": false,
+      "isPast": true,
+      "signals": ["coffee", "pastries"],
+      "speaker": "Prof. Michael Torres",
+      "topic": "Quantum Computing: From Theory to Practice",
+      "reviewsList": [
+        {
+          "author": "Chris L.",
+          "timeAgo": "2d ago",
+          "text": "Pastries were from local bakery, really good!",
+          "images": ["🥐", "☕"]
+        }
+      ],
+      "reviews": 5,
+      "rating": 4.2
+    },
+    {
+      "id": 4,
+      "title": "ACM Club Social",
+      "location": "Hackerman Hall B17",
+      "time": "April 16, 2026 5:00 PM",
+      "food": "Chipotle burritos and bowls",
+      "confidence": 95,
+      "source": "hub.jhu.edu",
+      "isPublic": true,
+      "isPast": true,
+      "signals": ["chipotle", "free food"],
+      "reviewsList": [
+        {
+          "author": "Taylor R.",
+          "timeAgo": "3d ago",
+          "text": "Chipotle ran out fast but the event was fun",
+          "images": ["🌮", "🌯"]
+        },
+        {
+          "author": "Sam W.",
+          "timeAgo": "3d ago",
+          "text": "Got there 10min late and only bowls left. Still good though!",
+          "images": []
+        }
+      ],
+      "reviews": 18,
+      "rating": 4.5
     }
   ],
-  "total_scanned": 5,
-  "food_found": 1,
+  "total_scanned": 23,
+  "food_found": 4,
   "status": "completed",
-  "message": "Real scan from Ara - found 1 event with free food"
+  "message": "Real scan from Ara - found 4 events with free food (2 upcoming, 2 past)"
 }
