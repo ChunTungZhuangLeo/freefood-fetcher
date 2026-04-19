@@ -13,9 +13,11 @@
             --cream-dark: #EDE6D9;
             --mustard: #D4A534;
             --mustard-dark: #B8912D;
+            --mustard-light: #E8C55A;
             --charcoal: #2C2C2C;
             --charcoal-light: #4A4A4A;
-            --warm-shadow: rgba(180, 140, 80, 0.2);
+            --warm-shadow: rgba(180, 140, 80, 0.25);
+            --accent: #E85D4C;
         }
 
         body {
@@ -24,6 +26,57 @@
             color: var(--charcoal);
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Pattern */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(212, 165, 52, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(232, 93, 76, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(212, 165, 52, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Floating Food Emojis */
+        .floating-foods {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .floating-food {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .floating-food:nth-child(1) { left: 5%; top: 20%; animation-delay: 0s; font-size: 2.5rem; }
+        .floating-food:nth-child(2) { left: 15%; top: 60%; animation-delay: -3s; font-size: 1.8rem; }
+        .floating-food:nth-child(3) { left: 85%; top: 15%; animation-delay: -5s; font-size: 2.2rem; }
+        .floating-food:nth-child(4) { left: 90%; top: 70%; animation-delay: -8s; font-size: 1.5rem; }
+        .floating-food:nth-child(5) { left: 75%; top: 85%; animation-delay: -12s; font-size: 2rem; }
+        .floating-food:nth-child(6) { left: 10%; top: 85%; animation-delay: -15s; font-size: 1.6rem; }
+        .floating-food:nth-child(7) { left: 50%; top: 10%; animation-delay: -7s; font-size: 1.4rem; }
+        .floating-food:nth-child(8) { left: 95%; top: 45%; animation-delay: -10s; font-size: 1.8rem; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            50% { transform: translateY(-10px) rotate(-3deg); }
+            75% { transform: translateY(-25px) rotate(3deg); }
         }
 
         /* Header */
@@ -32,28 +85,54 @@
             top: 0;
             left: 0;
             right: 0;
-            padding: 25px 50px;
+            padding: 20px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            background: rgba(245, 240, 232, 0.85);
-            backdrop-filter: blur(15px);
+            background: rgba(245, 240, 232, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(212, 165, 52, 0.1);
         }
 
         .header-left {
-            font-size: 0.8rem;
-            font-weight: 400;
-            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 2px;
             text-transform: uppercase;
             color: var(--charcoal-light);
         }
 
+        .header-left::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.4; }
+        }
+
         .header-right {
             font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--charcoal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-right::before {
+            content: '🍕';
+            font-size: 1.1rem;
         }
 
         /* Hero Section */
@@ -65,151 +144,331 @@
             justify-content: center;
             padding: 100px 40px 50px;
             text-align: center;
+            position: relative;
+            z-index: 10;
         }
+
+        /* Decorative Lines */
+        .deco-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, var(--mustard), transparent);
+            height: 1px;
+            opacity: 0.3;
+        }
+
+        .deco-line-1 { top: 15%; left: 5%; width: 80px; transform: rotate(-15deg); }
+        .deco-line-2 { top: 25%; right: 8%; width: 120px; transform: rotate(20deg); }
+        .deco-line-3 { bottom: 20%; left: 3%; width: 100px; transform: rotate(10deg); }
 
         /* Typography Section */
         .hero-text {
-            margin-bottom: 40px;
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .tagline {
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .tagline::before,
+        .tagline::after {
+            content: '';
+            width: 30px;
+            height: 2px;
+            background: var(--accent);
+            opacity: 0.5;
         }
 
         .main-title {
             font-family: 'Playfair Display', serif;
             font-weight: 900;
             color: var(--mustard);
-            line-height: 0.95;
-            text-shadow: 2px 2px 0 rgba(212, 165, 52, 0.1);
+            line-height: 0.9;
+            position: relative;
         }
 
         .main-title .line1 {
-            font-size: clamp(4rem, 15vw, 11rem);
+            font-size: clamp(4rem, 14vw, 10rem);
             display: block;
-            letter-spacing: -3px;
+            letter-spacing: -4px;
+            animation: slideUp 1s ease-out;
+        }
+
+        .main-title .line1::after {
+            content: '™';
+            font-size: 0.2em;
+            vertical-align: super;
+            opacity: 0.5;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .script-overlay {
             font-family: 'Dancing Script', cursive;
-            font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+            font-size: clamp(1.5rem, 3vw, 2rem);
             font-weight: 500;
             color: var(--charcoal);
-            margin: 15px 0;
-            opacity: 0.8;
+            margin: 12px 0;
+            opacity: 0.75;
+            animation: slideUp 1s ease-out 0.2s backwards;
         }
 
         .main-title .line2 {
-            font-size: clamp(4rem, 15vw, 11rem);
+            font-size: clamp(4rem, 14vw, 10rem);
             display: block;
-            letter-spacing: -3px;
+            letter-spacing: -4px;
+            animation: slideUp 1s ease-out 0.4s backwards;
         }
 
-        .brand-name {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 500;
-            letter-spacing: 6px;
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--charcoal);
+            color: var(--cream);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            color: var(--charcoal-light);
-            margin-top: 20px;
+            margin-top: 25px;
+            animation: slideUp 1s ease-out 0.6s backwards;
+        }
+
+        .brand-badge::before {
+            content: '⚡';
         }
 
         /* Hero Image */
         .hero-image-wrapper {
             position: relative;
-            margin-top: 30px;
+            margin-top: 25px;
             width: 100%;
-            max-width: 800px;
+            max-width: 750px;
+            animation: scaleIn 1s ease-out 0.5s backwards;
         }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Decorative Frame */
+        .image-frame {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 2px solid var(--mustard);
+            border-radius: 30px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .image-frame::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid var(--mustard);
+            border-radius: 26px;
+            opacity: 0.5;
+        }
+
+        /* Corner Decorations */
+        .corner-deco {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--mustard);
+            opacity: 0.6;
+        }
+
+        .corner-deco.tl { top: -25px; left: -25px; border-right: none; border-bottom: none; border-radius: 10px 0 0 0; }
+        .corner-deco.tr { top: -25px; right: -25px; border-left: none; border-bottom: none; border-radius: 0 10px 0 0; }
+        .corner-deco.bl { bottom: -25px; left: -25px; border-right: none; border-top: none; border-radius: 0 0 0 10px; }
+        .corner-deco.br { bottom: -25px; right: -25px; border-left: none; border-top: none; border-radius: 0 0 10px 0; }
 
         .hero-image {
             width: 100%;
             height: auto;
-            border-radius: 24px;
+            border-radius: 20px;
             box-shadow:
-                0 40px 80px var(--warm-shadow),
-                0 15px 35px rgba(0,0,0,0.1);
+                0 30px 60px var(--warm-shadow),
+                0 15px 30px rgba(0,0,0,0.1),
+                inset 0 0 0 1px rgba(255,255,255,0.1);
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+            position: relative;
+            z-index: 2;
         }
 
-        .hero-image:hover {
-            transform: scale(1.02);
+        .hero-image-wrapper:hover .hero-image {
+            transform: translateY(-8px);
+            box-shadow:
+                0 40px 80px var(--warm-shadow),
+                0 20px 40px rgba(0,0,0,0.15);
         }
 
         .image-placeholder {
             width: 100%;
             aspect-ratio: 16/10;
             background: linear-gradient(145deg, var(--cream-dark) 0%, #E8E0D0 100%);
-            border-radius: 24px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 6rem;
+            font-size: 5rem;
+        }
+
+        /* Floating Tags around Image */
+        .image-tag {
+            position: absolute;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: tagFloat 4s ease-in-out infinite;
+        }
+
+        .image-tag.tag-1 {
+            top: 10%;
+            right: -20px;
+            background: linear-gradient(135deg, #fff 0%, #f8f4ee 100%);
+            animation-delay: 0s;
+        }
+
+        .image-tag.tag-2 {
+            bottom: 20%;
+            left: -30px;
+            background: linear-gradient(135deg, var(--mustard-light) 0%, var(--mustard) 100%);
+            color: white;
+            animation-delay: -1s;
+        }
+
+        .image-tag.tag-3 {
+            top: 30%;
+            left: -25px;
+            animation-delay: -2s;
+        }
+
+        @keyframes tagFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         /* Eat Now Button - Bottom Left */
         .eat-now-btn {
             position: absolute;
-            left: 25px;
-            bottom: 25px;
-            background: var(--mustard);
+            left: 20px;
+            bottom: 20px;
+            background: linear-gradient(135deg, var(--mustard) 0%, var(--mustard-dark) 100%);
             color: white;
-            padding: 18px 36px;
+            padding: 18px 35px;
             border-radius: 50px;
             font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
             text-decoration: none;
             box-shadow:
-                0 15px 40px rgba(212, 165, 52, 0.6),
-                0 6px 15px rgba(0,0,0,0.2);
+                0 10px 30px rgba(212, 165, 52, 0.5),
+                0 4px 10px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.2);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             z-index: 10;
             white-space: nowrap;
+            border: 2px solid rgba(255,255,255,0.2);
         }
 
         .eat-now-btn:hover {
-            transform: scale(1.1) translateY(-3px);
+            transform: scale(1.08) translateY(-4px);
             box-shadow:
-                0 20px 50px rgba(212, 165, 52, 0.7),
-                0 10px 25px rgba(0,0,0,0.25);
-            background: var(--mustard-dark);
+                0 15px 40px rgba(212, 165, 52, 0.6),
+                0 8px 20px rgba(0,0,0,0.25);
+            background: linear-gradient(135deg, var(--mustard-dark) 0%, var(--mustard) 100%);
         }
 
         .eat-now-btn::after {
             content: '→';
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             transition: transform 0.3s;
         }
 
         .eat-now-btn:hover::after {
-            transform: translateX(6px);
+            transform: translateX(5px);
         }
 
-        /* Subtle animation for button */
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 15px 40px rgba(212, 165, 52, 0.6), 0 6px 15px rgba(0,0,0,0.2); }
-            50% { box-shadow: 0 18px 50px rgba(212, 165, 52, 0.8), 0 8px 20px rgba(0,0,0,0.25); }
+        /* Pulse ring around button */
+        .eat-now-btn::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 55px;
+            border: 2px solid var(--mustard);
+            opacity: 0;
+            animation: btnPulse 2s ease-out infinite;
         }
 
-        .eat-now-btn {
-            animation: pulse-glow 3s ease-in-out infinite;
-        }
-
-        .eat-now-btn:hover {
-            animation: none;
+        @keyframes btnPulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.15); opacity: 0; }
         }
 
         /* Bottom Stats */
         .bottom-stats {
             display: flex;
-            gap: 60px;
-            margin-top: 45px;
+            gap: 50px;
+            margin-top: 50px;
+            animation: slideUp 1s ease-out 0.8s backwards;
         }
 
         .stat {
             text-align: center;
+            position: relative;
+        }
+
+        .stat::after {
+            content: '';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 30px;
+            background: var(--mustard);
+            opacity: 0.3;
+        }
+
+        .stat:last-child::after {
+            display: none;
         }
 
         .stat-value {
@@ -220,47 +479,45 @@
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--charcoal-light);
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-top: 6px;
+            margin-top: 5px;
         }
 
         /* Responsive */
         @media (max-width: 900px) {
-            .hero-image-wrapper {
-                max-width: 90vw;
-            }
-            .eat-now-btn {
-                left: 15px;
-                bottom: 15px;
-                padding: 14px 28px;
-                font-size: 1.2rem;
-            }
+            .hero-image-wrapper { max-width: 90vw; }
+            .image-tag { display: none; }
+            .corner-deco { display: none; }
+            .image-frame { display: none; }
         }
 
         @media (max-width: 768px) {
-            .header { padding: 20px 25px; }
+            .header { padding: 15px 25px; }
             .hero { padding: 90px 20px 40px; }
             .main-title .line1,
-            .main-title .line2 { font-size: 3.2rem; letter-spacing: -1px; }
-            .script-overlay { font-size: 1.3rem; margin: 12px 0; }
+            .main-title .line2 { font-size: 3rem; letter-spacing: -2px; }
+            .script-overlay { font-size: 1.2rem; }
             .eat-now-btn {
                 padding: 14px 28px;
                 font-size: 1.1rem;
-                left: 12px;
-                bottom: 12px;
+                left: 15px;
+                bottom: 15px;
             }
-            .bottom-stats { gap: 35px; }
+            .bottom-stats { gap: 30px; }
             .stat-value { font-size: 1.8rem; }
+            .floating-food { opacity: 0.1; }
         }
 
         @media (max-width: 480px) {
             .main-title .line1,
-            .main-title .line2 { font-size: 2.4rem; }
+            .main-title .line2 { font-size: 2.2rem; }
             .script-overlay { font-size: 1rem; }
+            .tagline { font-size: 0.7rem; }
             .bottom-stats { flex-direction: column; gap: 20px; }
+            .stat::after { display: none; }
             .eat-now-btn {
                 padding: 12px 24px;
                 font-size: 1rem;
@@ -269,15 +526,36 @@
     </style>
 </head>
 <body>
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+
+    <!-- Floating Food Decorations -->
+    <div class="floating-foods">
+        <span class="floating-food">🍕</span>
+        <span class="floating-food">🌮</span>
+        <span class="floating-food">🍔</span>
+        <span class="floating-food">🍜</span>
+        <span class="floating-food">🍣</span>
+        <span class="floating-food">🥗</span>
+        <span class="floating-food">🍩</span>
+        <span class="floating-food">☕</span>
+    </div>
+
     <!-- Header -->
     <header class="header">
-        <div class="header-left">Campus Alerts</div>
+        <div class="header-left">Live Scanning</div>
         <div class="header-right">OnlyFood</div>
     </header>
 
     <!-- Hero -->
     <section class="hero">
+        <!-- Decorative Lines -->
+        <div class="deco-line deco-line-1"></div>
+        <div class="deco-line deco-line-2"></div>
+        <div class="deco-line deco-line-3"></div>
+
         <div class="hero-text">
+            <div class="tagline">JHU Campus</div>
             <h1 class="main-title">
                 <span class="line1">FOOD ONLY</span>
             </h1>
@@ -285,10 +563,25 @@
             <h1 class="main-title">
                 <span class="line2">FREE ONCE</span>
             </h1>
-            <div class="brand-name">OnlyFood</div>
+            <div class="brand-badge">OnlyFood</div>
         </div>
 
         <div class="hero-image-wrapper">
+            <!-- Decorative Frame -->
+            <div class="image-frame"></div>
+
+            <!-- Corner Decorations -->
+            <div class="corner-deco tl"></div>
+            <div class="corner-deco tr"></div>
+            <div class="corner-deco bl"></div>
+            <div class="corner-deco br"></div>
+
+            <!-- Floating Tags -->
+            <div class="image-tag tag-1">🔥 3 events now</div>
+            <div class="image-tag tag-2">🍕 Pizza Alert!</div>
+            <div class="image-tag tag-3">📍 Hodson Hall</div>
+
+            <!-- Main Image -->
             <a href="freefood-v2.html" class="eat-now-btn">Eat Now</a>
             <img src="main.jpg" alt="Delicious free campus food" class="hero-image"
                  onerror="this.outerHTML='<div class=\'image-placeholder\'>🍕</div>';">
