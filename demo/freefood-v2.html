@@ -2644,8 +2644,10 @@ freefood = ara.<span class="function">Automation</span>(
             btn.textContent = 'Submitting...';
             btn.disabled = true;
 
+            const apiBase = `${window.location.origin}`;
+
             try {
-                const res = await fetch('/api/reviews', {
+                const res = await fetch(`${apiBase}/api/reviews`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2657,7 +2659,10 @@ freefood = ara.<span class="function">Automation</span>(
                     })
                 });
 
-                if (!res.ok) throw new Error(`Server error ${res.status}`);
+                if (!res.ok) {
+                    const errBody = await res.text();
+                    throw new Error(`Server ${res.status}: ${errBody}`);
+                }
                 const saved = await res.json();
 
                 // Update event in memory immediately
@@ -2677,7 +2682,7 @@ freefood = ara.<span class="function">Automation</span>(
                 showToast('Review submitted! +10 XP');
             } catch (e) {
                 console.error('Review submit error:', e);
-                showToast('Could not save review — make sure the server is running on port 8080.');
+                showToast('Error: ' + e.message);
             } finally {
                 btn.textContent = 'Submit Review (+10 XP)';
                 btn.disabled = false;
@@ -2686,7 +2691,7 @@ freefood = ara.<span class="function">Automation</span>(
 
         async function loadReviewsForEvent(eventId) {
             try {
-                const res = await fetch(`/api/reviews/${eventId}`);
+                const res = await fetch(`${window.location.origin}/api/reviews/${eventId}`);
                 if (!res.ok) return [];
                 return await res.json();
             } catch { return []; }
