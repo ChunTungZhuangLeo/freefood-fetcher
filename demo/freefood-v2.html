@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Food Fetcher - JHU</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #feca57;
+            --success: #00ff88;
+            --info: #00d9ff;
+            --dark: #0a0a15;
+            --darker: #050510;
+            --card: rgba(255,255,255,0.05);
+            --border: rgba(255,255,255,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(10,10,21,0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .nav-logo span { font-size: 1.5rem; }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active { color: white; }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .login-btn {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .login-btn:hover { transform: scale(1.05); }
+
+        .user-menu {
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-menu.show { display: flex; }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name { font-weight: 600; font-size: 0.9rem; }
+        .user-title { font-size: 0.75rem; color: var(--secondary); }
+
+        /* Main Layout */
+        .main {
+            display: grid;
+            grid-template-columns: 320px 1fr 350px;
+            gap: 0;
+            margin-top: 60px;
+            height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--darker);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--success), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Leaderboard */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .leaderboard-rank {
+            width: 28px;
+            height: 28px;
+            background: var(--card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .leaderboard-rank.gold { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; }
+        .leaderboard-rank.silver { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #000; }
+        .leaderboard-rank.bronze { background: linear-gradient(135deg, #cd7f32, #a0522d); color: #fff; }
+
+        .leaderboard-info { flex: 1; }
+        .leaderboard-name { font-weight: 600; font-size: 0.9rem; }
+        .leaderboard-title { font-size: 0.75rem; color: var(--secondary); }
+        .leaderboard-reviews { font-size: 0.8rem; color: #888; }
+
+        /* Your Rank */
+        .your-rank {
+            background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,217,255,0.1));
+            border: 1px solid rgba(0,255,136,0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .your-rank-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .your-rank-title { font-weight: 600; }
+        .your-rank-badge {
+            background: var(--secondary);
+            color: #000;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--info));
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        /* Map */
+        .map-container {
+            position: relative;
+        }
+
+        #map { height: 100%; width: 100%; }
+
+        .map-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 500;
+            display: flex;
+            gap: 10px;
+        }
+
+        .map-filter {
+            background: rgba(10,10,21,0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .map-filter:hover, .map-filter.active {
+            background: var(--success);
+            color: #000;
+        }
+
+        .map-legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 500;
+            background: rgba(10,10,21,0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .legend-item:last-child { margin-bottom: 0; }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.public { background: var(--success); }
+        .legend-dot.private { background: var(--info); }
+        .legend-dot.hot { background: var(--primary); }
+
+        /* Events Panel */
+        .events-panel {
+            background: var(--darker);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .panel-tabs {
+            display: flex;
+            gap: 5px;
+        }
+
+        .panel-tab {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            background: var(--card);
+            transition: all 0.3s;
+        }
+
+        .panel-tab:hover, .panel-tab.active {
+            background: var(--success);
+            color: #000;
+        }
+
+        .events-list {
+            padding: 15px;
+        }
+
+        /* Event Card */
+        .event-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .event-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border);
+        }
+
+        .event-card.selected {
+            border-color: var(--success);
+            background: rgba(0,255,136,0.05);
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .event-title {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-badge {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .event-badge.public {
+            background: rgba(0,255,136,0.2);
+            color: var(--success);
+        }
+
+        .event-badge.private {
+            background: rgba(0,217,255,0.2);
+            color: var(--info);
+        }
+
+        .event-badge.hot {
+            background: rgba(255,107,107,0.2);
+            color: var(--primary);
+        }
+
+        .event-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .event-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--secondary);
+        }
+
+        .event-food {
+            background: rgba(254,202,87,0.1);
+            border-left: 3px solid var(--secondary);
+            padding: 10px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .event-photos {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .event-photo {
+            width: 50px;
+            height: 50px;
+            background: var(--card);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .event-photo.more {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .event-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .event-tag {
+            background: var(--card);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .event-action {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--card);
+        }
+
+        .event-action:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .event-action.primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* Login Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--darker);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-logo { font-size: 4rem; margin-bottom: 20px; }
+        .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
+        .modal-desc { color: #888; margin-bottom: 30px; }
+
+        .jhu-login-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: #0072CE;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .jhu-login-btn:hover { background: #005ba8; }
+
+        .modal-divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 25px 0;
+            color: #666;
+        }
+
+        .modal-divider::before, .modal-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .guest-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guest-btn:hover { background: var(--card); }
+
+        .modal-features {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .modal-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .modal-feature.locked { opacity: 0.5; }
+
+        /* Review Modal */
+        .review-modal {
+            max-width: 500px;
+        }
+
+        .rating-select {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .rating-star {
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .rating-star:hover { transform: scale(1.2); }
+        .rating-star.active { color: var(--secondary); }
+
+        .review-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .review-tag {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .review-tag:hover, .review-tag.selected {
+            background: var(--success);
+            color: #000;
+            border-color: var(--success);
+        }
+
+        .review-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: white;
+            font-family: inherit;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        .review-textarea::placeholder { color: #666; }
+
+        .photo-upload {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .photo-upload:hover {
+            border-color: var(--success);
+            background: rgba(0,255,136,0.05);
+        }
+
+        .submit-review-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #000;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--success);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            z-index: 3000;
+            transition: transform 0.5s;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Leaflet overrides */
+        .leaflet-popup-content-wrapper {
+            background: rgba(10,10,21,0.95);
+            color: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .leaflet-popup-tip { background: rgba(10,10,21,0.95); }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main { grid-template-columns: 1fr; }
+            .sidebar, .events-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-logo">
+            <span>🍕</span>
+            Free Food Fetcher
+        </div>
+        <div class="nav-links">
+            <a class="nav-link active" onclick="showTab('map')">Map</a>
+            <a class="nav-link" onclick="showTab('events')">Events</a>
+            <a class="nav-link" onclick="showTab('leaderboard')">Leaderboard</a>
+            <a class="nav-link" onclick="showTab('about')">About</a>
+        </div>
+        <div class="nav-right">
+            <button class="login-btn" id="loginBtn" onclick="showLoginModal()">Login with JHU</button>
+            <div class="user-menu" id="userMenu">
+                <div class="user-info">
+                    <div class="user-name">Leo Z</div>
+                    <div class="user-title">🍕 Pizza Scout</div>
+                </div>
+                <div class="user-avatar">L</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">📊 Today's Stats</div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalEvents">12</div>
+                        <div class="stat-label">Events Found</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="freeFood">6</div>
+                        <div class="stat-label">Free Food</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">$47</div>
+                        <div class="stat-label">Saved Today</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">89%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">🏆 Top Reviewers</div>
+                <div class="leaderboard">
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank gold">1</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">PizzaHunter99</div>
+                            <div class="leaderboard-title">👑 Campus Food God</div>
+                        </div>
+                        <div class="leaderboard-reviews">52</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank silver">2</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">TacoMaster_JHU</div>
+                            <div class="leaderboard-title">🦁 The Jungle King</div>
+                        </div>
+                        <div class="leaderboard-reviews">48</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank bronze">3</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">SpeedyEats</div>
+                            <div class="leaderboard-title">🏃 Speed Eater</div>
+                        </div>
+                        <div class="leaderboard-reviews">41</div>
+                    </div>
+                </div>
+
+                <div class="your-rank" id="yourRank" style="display: none;">
+                    <div class="your-rank-header">
+                        <span class="your-rank-title">Your Rank: #23</span>
+                        <span class="your-rank-badge">🍕 Pizza Scout</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <div class="progress-text">3 more reviews to "Taco Tracker" 🌮</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">⚡ Powered by Ara</div>
+                <div style="background: var(--card); border-radius: 12px; padding: 15px; font-size: 0.85rem; color: #888;">
+                    <div style="margin-bottom: 8px;">🔄 Last scan: 2 min ago</div>
+                    <div style="margin-bottom: 8px;">🌐 Sources: JHU Hub, Dept Calendars</div>
+                    <div>⏰ Next scan: 58 min</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map -->
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-overlay">
+                <div class="map-filter active" onclick="filterEvents('all')">All Events</div>
+                <div class="map-filter" onclick="filterEvents('food')">🍕 Free Food</div>
+                <div class="map-filter" onclick="filterEvents('hot')">🔥 Hot Now</div>
+            </div>
+            <div class="map-legend">
+                <div class="legend-item">
+                    <div class="legend-dot public"></div>
+                    <span>Public Event</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot private"></div>
+                    <span>JHU Only 🔒</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot hot"></div>
+                    <span>Happening Now 🔥</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Panel -->
+        <div class="events-panel">
+            <div class="panel-header">
+                <div class="panel-title">📅 Events</div>
+                <div class="panel-tabs">
+                    <div class="panel-tab active">All</div>
+                    <div class="panel-tab">Food</div>
+                    <div class="panel-tab">Near Me</div>
+                </div>
+            </div>
+            <div class="events-list" id="eventsList">
+                <!-- Events will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-logo">🍕</div>
+            <div class="modal-title">Join Free Food Fetcher</div>
+            <div class="modal-desc">Login with your JHU email to unlock all features</div>
+
+            <button class="jhu-login-btn" onclick="loginJHU()">
+                🎓 Login with JHU SSO
+            </button>
+
+            <div class="modal-divider">or</div>
+
+            <button class="guest-btn" onclick="continueAsGuest()">
+                Continue as Guest
+            </button>
+
+            <div class="modal-features">
+                <div class="modal-feature">
+                    <span>✅</span> View public Baltimore events
+                </div>
+                <div class="modal-feature">
+                    <span>✅</span> Browse campus map
+                </div>
+                <div class="modal-feature locked">
+                    <span>🔒</span> See department events (JHU only)
+                </div>
+                <div class="modal-feature locked">
+                    <span>🔒</span> Write reviews & earn titles (JHU only)
+                </div>
+                <div class="modal-feature locked">
+                    <span>🔒</span> Connect Outlook calendar (JHU only)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal review-modal">
+            <div class="modal-title">✍️ Write a Review</div>
+            <div class="modal-desc" id="reviewEventName">ACM Meeting - Chipotle</div>
+
+            <div class="rating-select" id="ratingStars">
+                <span class="rating-star" onclick="setRating(1)">☆</span>
+                <span class="rating-star" onclick="setRating(2)">☆</span>
+                <span class="rating-star" onclick="setRating(3)">☆</span>
+                <span class="rating-star" onclick="setRating(4)">☆</span>
+                <span class="rating-star" onclick="setRating(5)">☆</span>
+            </div>
+
+            <div class="review-tags" id="reviewTags">
+                <button class="review-tag" onclick="toggleTag(this)">🔥 Worth It</button>
+                <button class="review-tag" onclick="toggleTag(this)">🍕 Great Food</button>
+                <button class="review-tag" onclick="toggleTag(this)">📦 Big Portions</button>
+                <button class="review-tag" onclick="toggleTag(this)">👥 Crowded</button>
+                <button class="review-tag" onclick="toggleTag(this)">⚡ Grab & Go</button>
+                <button class="review-tag" onclick="toggleTag(this)">💀 Gone Fast</button>
+            </div>
+
+            <textarea class="review-textarea" placeholder="Share your experience..."></textarea>
+
+            <div class="photo-upload" onclick="uploadPhoto()">
+                📸 Click to add photos
+            </div>
+
+            <button class="submit-review-btn" onclick="submitReview()">
+                Submit Review (+10 XP)
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">🎉 Review submitted! +10 XP</div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // State
+        let isLoggedIn = false;
+        let currentRating = 0;
+
+        // Events data
+        const events = [
+            {
+                id: 1,
+                title: "Game Showcase",
+                location: "Hodson Hall",
+                coords: [39.3277, -76.6217],
+                time: "Today 6:00 PM",
+                food: "Free pizza while playing student-made games!",
+                score: 95,
+                rating: 4.8,
+                reviews: 34,
+                isPublic: true,
+                isHot: true,
+                photos: ["🍕", "🎮", "🍕"],
+                tags: ["🔥 Worth It", "🍕 Great Food"]
+            },
+            {
+                id: 2,
+                title: "ACM Club Meeting",
+                location: "Malone Hall 228",
+                coords: [39.3269, -76.6211],
+                time: "Tomorrow 5:00 PM",
+                food: "Chipotle burritos and bowls provided!",
+                score: 92,
+                rating: 4.9,
+                reviews: 52,
+                isPublic: false,
+                isHot: false,
+                photos: ["🌮", "🌯", "🥤", "🌮"],
+                tags: ["🔥 Worth It", "📦 Big Portions"]
+            },
+            {
+                id: 3,
+                title: "CS Department Talk",
+                location: "Hackerman Hall B17",
+                coords: [39.3264, -76.6205],
+                time: "Today 3:30 PM",
+                food: "Pizza after the talk",
+                score: 88,
+                rating: 4.3,
+                reviews: 18,
+                isPublic: false,
+                isHot: true,
+                photos: ["🍕", "💻"],
+                tags: ["⚡ Grab & Go"]
+            },
+            {
+                id: 4,
+                title: "Research Symposium",
+                location: "Glass Pavilion",
+                coords: [39.3301, -76.6198],
+                time: "Tomorrow 11:00 AM",
+                food: "Catered lunch reception",
+                score: 85,
+                rating: 4.5,
+                reviews: 23,
+                isPublic: true,
+                isHot: false,
+                photos: ["🥗", "🥪", "☕"],
+                tags: ["🥗 Healthy", "👥 Crowded"]
+            },
+            {
+                id: 5,
+                title: "Physics Colloquium",
+                location: "Bloomberg 462",
+                coords: [39.3295, -76.6223],
+                time: "Today 4:00 PM",
+                food: "Refreshments and cookies",
+                score: 65,
+                rating: 3.8,
+                reviews: 12,
+                isPublic: false,
+                isHot: false,
+                photos: ["🍪", "☕"],
+                tags: ["😌 Chill"]
+            },
+            {
+                id: 6,
+                title: "Baltimore Food Festival",
+                location: "Inner Harbor",
+                coords: [39.2855, -76.6125],
+                time: "Saturday 12:00 PM",
+                food: "Free samples from local vendors!",
+                score: 90,
+                rating: 4.7,
+                reviews: 156,
+                isPublic: true,
+                isHot: false,
+                photos: ["🍔", "🌭", "🍦", "🥨"],
+                tags: ["🔥 Worth It", "🎉 Festival"]
+            }
+        ];
+
+        // Initialize map
+        const map = L.map('map').setView([39.3299, -76.6205], 15);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Render events
+        function renderEvents() {
+            const list = document.getElementById('eventsList');
+            list.innerHTML = '';
+
+            events.forEach(event => {
+                // Skip private events if not logged in
+                if (!event.isPublic && !isLoggedIn) return;
+
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.onclick = () => selectEvent(event);
+
+                let badgeClass = event.isPublic ? 'public' : 'private';
+                let badgeText = event.isPublic ? '🌐 Public' : '🔒 JHU';
+                if (event.isHot) {
+                    badgeClass = 'hot';
+                    badgeText = '🔥 Now';
+                }
+
+                card.innerHTML = `
+                    <div class="event-header">
+                        <div class="event-title">
+                            ${event.title}
+                        </div>
+                        <span class="event-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="event-meta">
+                        <span>📍 ${event.location}</span>
+                        <span>🕐 ${event.time}</span>
+                        <span class="event-rating">⭐ ${event.rating} (${event.reviews})</span>
+                    </div>
+                    <div class="event-food">"${event.food}"</div>
+                    <div class="event-photos">
+                        ${event.photos.slice(0, 3).map(p => `<div class="event-photo">${p}</div>`).join('')}
+                        ${event.photos.length > 3 ? `<div class="event-photo more">+${event.photos.length - 3}</div>` : ''}
+                    </div>
+                    <div class="event-tags">
+                        ${event.tags.map(t => `<span class="event-tag">${t}</span>`).join('')}
+                    </div>
+                    <div class="event-actions">
+                        <div class="event-action" onclick="event.stopPropagation(); shareEvent(${event.id})">📤 Share</div>
+                        <div class="event-action" onclick="event.stopPropagation(); showReviewModal(${event.id})">✍️ Review</div>
+                        <div class="event-action primary" onclick="event.stopPropagation(); setAlert(${event.id})">🔔 Alert</div>
+                    </div>
+                `;
+                list.appendChild(card);
+
+                // Add marker to map
+                const color = event.isHot ? '#ff6b6b' : (event.isPublic ? '#00ff88' : '#00d9ff');
+                const icon = L.divIcon({
+                    html: `<div style="
+                        width: 40px; height: 40px;
+                        background: ${color};
+                        border-radius: 50%;
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 1.3rem;
+                        box-shadow: 0 3px 15px rgba(0,0,0,0.4);
+                        border: 3px solid white;
+                    ">🍕</div>`,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20]
+                });
+
+                L.marker(event.coords, { icon }).addTo(map)
+                    .bindPopup(`
+                        <div style="padding: 10px;">
+                            <div style="font-weight: 700; margin-bottom: 5px;">${event.title}</div>
+                            <div style="color: #aaa; font-size: 0.85rem; margin-bottom: 5px;">📍 ${event.location}</div>
+                            <div style="color: #aaa; font-size: 0.85rem; margin-bottom: 10px;">🕐 ${event.time}</div>
+                            <div style="background: rgba(0,255,136,0.1); padding: 10px; border-radius: 8px; font-size: 0.85rem;">
+                                🍽️ ${event.food}<br>
+                                ⭐ ${event.rating} (${event.reviews} reviews)
+                            </div>
+                        </div>
+                    `);
+            });
+
+            // Update stats
+            const visibleEvents = events.filter(e => e.isPublic || isLoggedIn);
+            document.getElementById('totalEvents').textContent = visibleEvents.length;
+            document.getElementById('freeFood').textContent = visibleEvents.filter(e => e.score >= 70).length;
+        }
+
+        // Login functions
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+        }
+
+        function hideLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+        }
+
+        function loginJHU() {
+            isLoggedIn = true;
+            hideLoginModal();
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('userMenu').classList.add('show');
+            document.getElementById('yourRank').style.display = 'block';
+            renderEvents();
+            showToast('🎉 Welcome back, Leo! You now have full access.');
+        }
+
+        function continueAsGuest() {
+            hideLoginModal();
+            showToast('👋 Browsing as guest. Login to see JHU events!');
+        }
+
+        // Review functions
+        function showReviewModal(eventId) {
+            if (!isLoggedIn) {
+                showLoginModal();
+                return;
+            }
+            const event = events.find(e => e.id === eventId);
+            document.getElementById('reviewEventName').textContent = event.title;
+            document.getElementById('reviewModal').classList.add('show');
+        }
+
+        function setRating(rating) {
+            currentRating = rating;
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach((star, i) => {
+                star.textContent = i < rating ? '★' : '☆';
+                star.classList.toggle('active', i < rating);
+            });
+        }
+
+        function toggleTag(el) {
+            el.classList.toggle('selected');
+        }
+
+        function uploadPhoto() {
+            showToast('📸 Photo upload coming soon!');
+        }
+
+        function submitReview() {
+            document.getElementById('reviewModal').classList.remove('show');
+            showToast('🎉 Review submitted! +10 XP');
+        }
+
+        // Other functions
+        function selectEvent(event) {
+            map.flyTo(event.coords, 17);
+        }
+
+        function shareEvent(id) {
+            const event = events.find(e => e.id === id);
+            const text = `🍕 Free food alert! ${event.title} at ${event.location} - ${event.time}`;
+            navigator.clipboard.writeText(text);
+            showToast('📋 Copied to clipboard!');
+        }
+
+        function setAlert(id) {
+            if (!isLoggedIn) {
+                showLoginModal();
+                return;
+            }
+            showToast('🔔 Alert set! We\'ll notify you 30min before.');
+        }
+
+        function filterEvents(type) {
+            document.querySelectorAll('.map-filter').forEach(f => f.classList.remove('active'));
+            event.target.classList.add('active');
+            // Filter logic here
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Initialize
+        renderEvents();
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('show');
+            });
+        });
+    </script>
+</body>
+</html>
