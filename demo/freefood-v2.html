@@ -562,6 +562,256 @@
             line-height: 1.5;
         }
 
+        /* Squad Mode */
+        .squad-panel {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            z-index: 500;
+            background: var(--cream-light);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px;
+            width: 220px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .squad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .squad-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--charcoal);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .squad-toggle {
+            width: 40px;
+            height: 22px;
+            background: var(--cream-dark);
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .squad-toggle.active {
+            background: var(--success);
+        }
+
+        .squad-toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .squad-toggle.active::after {
+            left: 20px;
+        }
+
+        .squad-members {
+            margin-bottom: 12px;
+        }
+
+        .squad-member {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--card);
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+
+        .squad-member-avatar {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .squad-member-name {
+            flex: 1;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .squad-member-status {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+        }
+
+        .squad-member-status.offline {
+            background: #999;
+        }
+
+        .squad-invite-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .squad-invite-btn:hover {
+            background: var(--secondary);
+        }
+
+        /* Bounty System */
+        .bounty-banner {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 500;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(255, 165, 0, 0.4);
+            animation: bountyPulse 2s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes bountyPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.03); }
+        }
+
+        .bounty-banner:hover {
+            animation: none;
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        .bounty-icon {
+            font-size: 1.3rem;
+        }
+
+        .bounty-xp {
+            background: rgba(0,0,0,0.2);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .bounty-modal {
+            max-width: 500px;
+        }
+
+        .bounty-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,165,0,0.1));
+            border: 2px solid #FFD700;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .bounty-card-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .bounty-card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            margin-bottom: 5px;
+        }
+
+        .bounty-card-desc {
+            font-size: 0.9rem;
+            color: var(--charcoal-light);
+            margin-bottom: 15px;
+        }
+
+        .bounty-card-reward {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .bounty-claim-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .bounty-claim-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(255,165,0,0.4);
+        }
+
+        /* Sound Toggle */
+        .sound-toggle {
+            position: absolute;
+            bottom: 140px;
+            left: 20px;
+            z-index: 500;
+            width: 45px;
+            height: 45px;
+            background: var(--cream-light);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .sound-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .sound-toggle.muted {
+            opacity: 0.5;
+        }
+
         /* Events Panel */
         .events-panel {
             background: var(--cream-light);
@@ -872,19 +1122,6 @@
         .event-card.past {
             opacity: 0.7;
         }
-
-        /* Back Button */
-        .back-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 0;
-        }
-
-        .back-btn:hover { opacity: 0.8; }
 
         /* Login Modal */
         .modal-overlay {
@@ -1469,11 +1706,10 @@
 <body>
     <!-- Navigation -->
     <nav class="nav">
-        <div class="nav-logo">
-            <a href="index.html" class="back-btn">← Back</a>
-            <span style="margin-left: 15px;">🍕</span>
+        <a href="index.html" class="nav-logo" style="text-decoration: none; color: inherit;">
+            <span>🍕</span>
             OnlyFood
-        </div>
+        </a>
         <div class="nav-links">
             <a class="nav-link active" onclick="showTab('map')">Map</a>
             <a class="nav-link" onclick="showTab('events')">Events</a>
@@ -1655,6 +1891,34 @@
 
             <!-- Ping Feed -->
             <div class="ping-feed" id="pingFeed"></div>
+
+            <!-- Sound Toggle -->
+            <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle ping sounds">
+                🔊
+            </button>
+
+            <!-- Squad Panel -->
+            <div class="squad-panel" id="squadPanel">
+                <div class="squad-header">
+                    <div class="squad-title">👥 Squad Mode</div>
+                    <div class="squad-toggle" id="squadToggle" onclick="toggleSquad()"></div>
+                </div>
+                <div class="squad-members" id="squadMembers">
+                    <div class="squad-member">
+                        <div class="squad-member-avatar">L</div>
+                        <div class="squad-member-name">Leo (You)</div>
+                        <div class="squad-member-status"></div>
+                    </div>
+                </div>
+                <button class="squad-invite-btn" onclick="showSquadInvite()">+ Invite to Squad</button>
+            </div>
+
+            <!-- Bounty Banner -->
+            <div class="bounty-banner" id="bountyBanner" onclick="showBountyModal()">
+                <span class="bounty-icon">🏆</span>
+                <span>BOUNTY: First to find rare sushi!</span>
+                <span class="bounty-xp">+50 XP</span>
+            </div>
         </div>
 
         <!-- Events Panel -->
@@ -1765,6 +2029,49 @@
             <button class="invite-btn" onclick="sendInvite()">📤 Send Invite</button>
 
             <button class="guest-btn" style="margin-top: 10px;" onclick="closeInviteModal()">Skip & Just Ping</button>
+        </div>
+    </div>
+
+    <!-- Bounty Modal -->
+    <div class="modal-overlay" id="bountyModal">
+        <div class="modal bounty-modal">
+            <div class="modal-logo">🏆</div>
+            <div class="modal-title">Active Bounties</div>
+            <div class="modal-desc">Complete bounties to earn XP and climb the leaderboard!</div>
+
+            <div style="margin-top: 20px; display: grid; gap: 15px;">
+                <div class="bounty-card" id="bounty1">
+                    <div class="bounty-card-icon">🍣</div>
+                    <div style="flex: 1;">
+                        <div class="bounty-card-title">Sushi Spotter</div>
+                        <div class="bounty-card-desc">Be first to report a sushi event on campus</div>
+                        <div class="bounty-card-reward">+50 XP</div>
+                    </div>
+                    <button class="bounty-claim-btn" onclick="claimBounty('sushi')">Claim</button>
+                </div>
+
+                <div class="bounty-card" id="bounty2">
+                    <div class="bounty-card-icon">🍕</div>
+                    <div style="flex: 1;">
+                        <div class="bounty-card-title">Pizza Pioneer</div>
+                        <div class="bounty-card-desc">Review 3 pizza events this week</div>
+                        <div class="bounty-card-reward">+30 XP</div>
+                    </div>
+                    <button class="bounty-claim-btn" style="background: var(--charcoal-light); cursor: default;">2/3</button>
+                </div>
+
+                <div class="bounty-card" id="bounty3">
+                    <div class="bounty-card-icon">👥</div>
+                    <div style="flex: 1;">
+                        <div class="bounty-card-title">Squad Leader</div>
+                        <div class="bounty-card-desc">Invite 2 friends to your squad</div>
+                        <div class="bounty-card-reward">+25 XP</div>
+                    </div>
+                    <button class="bounty-claim-btn" onclick="claimBounty('squad')">Claim</button>
+                </div>
+            </div>
+
+            <button class="guest-btn" style="margin-top: 20px;" onclick="closeBountyModal()">Close</button>
         </div>
     </div>
 
@@ -2828,6 +3135,144 @@ freefood = ara.<span class="function">Automation</span>(
             item.onclick = () => map.flyTo([39.3280, -76.6210], 17);
             feed.appendChild(item);
         }, 2000);
+
+        // ============ SOUND SYSTEM ============
+        let soundEnabled = true;
+
+        // Create audio context for ping sounds
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        const pingSounds = {
+            assist: { freq: 880, duration: 0.15 },
+            omw: { freq: 660, duration: 0.12 },
+            danger: { freq: 440, duration: 0.2 },
+            missing: { freq: 550, duration: 0.1 }
+        };
+
+        function playPingSound(type) {
+            if (!soundEnabled) return;
+
+            // Resume audio context if suspended (browser policy)
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            const sound = pingSounds[type] || pingSounds.assist;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = sound.freq;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + sound.duration);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + sound.duration);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundToggle');
+            btn.textContent = soundEnabled ? '🔊' : '🔇';
+            btn.classList.toggle('muted', !soundEnabled);
+            showToast(soundEnabled ? '🔊 Sound enabled' : '🔇 Sound muted');
+        }
+
+        // Hook sound into ping placement
+        const originalPlacePing = placePing;
+        placePing = function(type, latlng, skipCooldown = false) {
+            playPingSound(type);
+            originalPlacePing(type, latlng, skipCooldown);
+        };
+
+        // ============ SQUAD MODE ============
+        let squadEnabled = false;
+        const squadMembers = [
+            { name: 'Leo (You)', avatar: 'L', status: 'online' }
+        ];
+
+        function toggleSquad() {
+            squadEnabled = !squadEnabled;
+            const toggle = document.getElementById('squadToggle');
+            toggle.classList.toggle('active', squadEnabled);
+
+            if (squadEnabled) {
+                showToast('👥 Squad Mode ON - Pings shared with squad only');
+            } else {
+                showToast('🌐 Squad Mode OFF - Pings visible to everyone');
+            }
+        }
+
+        function showSquadInvite() {
+            const email = prompt('Enter friend\'s email to invite to squad:');
+            if (email && email.includes('@')) {
+                // Simulate adding member
+                const name = email.split('@')[0];
+                const initial = name.charAt(0).toUpperCase();
+
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'squad-member';
+                memberDiv.innerHTML = `
+                    <div class="squad-member-avatar" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">${initial}</div>
+                    <div class="squad-member-name">${name}</div>
+                    <div class="squad-member-status offline">invited</div>
+                `;
+
+                document.getElementById('squadMembers').appendChild(memberDiv);
+                showToast(`📧 Invite sent to ${email}!`);
+            } else if (email) {
+                showToast('📧 Please enter a valid email');
+            }
+        }
+
+        // ============ BOUNTY SYSTEM ============
+        let userXP = 0;
+
+        function showBountyModal() {
+            document.getElementById('bountyModal').classList.add('show');
+        }
+
+        function closeBountyModal() {
+            document.getElementById('bountyModal').classList.remove('show');
+        }
+
+        function claimBounty(bountyType) {
+            const rewards = {
+                sushi: 50,
+                squad: 25
+            };
+
+            const xp = rewards[bountyType] || 10;
+            userXP += xp;
+
+            // Animate the claim
+            const btn = event.target;
+            btn.textContent = '✓ Claimed!';
+            btn.style.background = 'var(--success)';
+            btn.style.cursor = 'default';
+            btn.onclick = null;
+
+            showToast(`🏆 +${xp} XP earned! Total: ${userXP} XP`);
+
+            // Update bounty banner
+            setTimeout(() => {
+                const banner = document.getElementById('bountyBanner');
+                banner.innerHTML = `
+                    <span class="bounty-icon">✨</span>
+                    <span>Nice! Your XP: ${userXP}</span>
+                    <span class="bounty-xp">🏆</span>
+                `;
+            }, 500);
+        }
+
+        // Close bounty modal on overlay click
+        document.getElementById('bountyModal').addEventListener('click', (e) => {
+            if (e.target.id === 'bountyModal') closeBountyModal();
+        });
     </script>
 </body>
 </html>
