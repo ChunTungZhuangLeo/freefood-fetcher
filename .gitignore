@@ -23,3 +23,4 @@ ENV/
 credentials.json
 *.pem
 *.key
+reviews.db

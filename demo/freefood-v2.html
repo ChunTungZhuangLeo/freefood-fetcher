@@ -2605,12 +2605,19 @@ freefood = ara.<span class="function">Automation</span>(
         }
 
         // Review functions
+        let currentReviewEventId = null;
+
         function showReviewModal(eventId) {
             if (!isLoggedIn) {
                 showLoginModal();
                 return;
             }
             const event = events.find(e => e.id === eventId);
+            currentReviewEventId = eventId;
+            currentRating = 0;
+            document.querySelectorAll('.rating-star').forEach(s => { s.textContent = '☆'; s.classList.remove('active'); });
+            document.querySelectorAll('.review-tag').forEach(t => t.classList.remove('selected'));
+            document.querySelector('.review-textarea').value = '';
             document.getElementById('reviewEventName').textContent = event.title;
             document.getElementById('reviewModal').classList.add('show');
         }
@@ -2632,9 +2639,71 @@ freefood = ara.<span class="function">Automation</span>(
             showToast('📸 Photo upload coming soon!');
         }
 
-        function submitReview() {
-            document.getElementById('reviewModal').classList.remove('show');
-            showToast('🎉 Review submitted! +10 XP');
+        async function submitReview() {
+            const text = document.querySelector('.review-textarea').value.trim();
+            const tags = [...document.querySelectorAll('.review-tag.selected')].map(t => t.textContent.trim());
+            const author = isLoggedIn ? (currentUser?.name || 'JHU Student') : 'Anonymous';
+
+            if (!currentRating && !text) {
+                showToast('⚠️ Add a rating or write something!');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event_id: String(currentReviewEventId),
+                        author,
+                        rating: currentRating,
+                        text,
+                        tags
+                    })
+                });
+                if (!res.ok) throw new Error('Failed');
+                const saved = await res.json();
+
+                // Inject review into the event's reviewsList immediately
+                const ev = events.find(e => e.id === currentReviewEventId);
+                if (ev) {
+                    if (!ev.reviewsList) ev.reviewsList = [];
+                    ev.reviewsList.unshift({ author: saved.author, timeAgo: 'just now', text: saved.text, images: [] });
+                    ev.reviews = (ev.reviews || 0) + 1;
+                    if (saved.rating) {
+                        ev.rating = ev.reviews === 1 ? saved.rating : parseFloat(((ev.rating * (ev.reviews - 1) + saved.rating) / ev.reviews).toFixed(1));
+                    }
+                }
+
+                document.getElementById('reviewModal').classList.remove('show');
+                renderEvents();
+                showToast('🎉 Review submitted! +10 XP');
+            } catch (e) {
+                showToast('❌ Could not save review. Is the server running?');
+            }
+        }
+
+        async function loadReviewsForEvent(eventId) {
+            try {
+                const res = await fetch(`/api/reviews/${eventId}`);
+                if (!res.ok) return [];
+                return await res.json();
+            } catch { return []; }
+        }
+
+        async function loadAllReviews() {
+            await Promise.all(events.map(async ev => {
+                const reviews = await loadReviewsForEvent(ev.id);
+                if (reviews.length > 0) {
+                    ev.reviewsList = reviews.map(r => ({ author: r.author, timeAgo: r.timeAgo, text: r.text, images: [] }));
+                    ev.reviews = reviews.length;
+                    const rated = reviews.filter(r => r.rating > 0);
+                    if (rated.length > 0) {
+                        ev.rating = parseFloat((rated.reduce((s, r) => s + r.rating, 0) / rated.length).toFixed(1));
+                    }
+                }
+            }));
+            renderEvents();
         }
 
         // Other functions
@@ -2761,6 +2830,7 @@ freefood = ara.<span class="function">Automation</span>(
                     });
                 });
                 renderEvents();
+                loadAllReviews();
             }
 
             // Update scan log with real data
@@ -2827,7 +2897,7 @@ freefood = ara.<span class="function">Automation</span>(
         }
 
         // Initialize
-        loadAraData();
+        loadAraData().then(() => loadAllReviews());
         renderEvents();
 
         // Ara Modal Functions
