@@ -1124,12 +1124,12 @@
                         <div class="stat-label">Free Food</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value">$47</div>
+                        <div class="stat-value" id="savedToday">$0</div>
                         <div class="stat-label">Saved Today</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value">89%</div>
-                        <div class="stat-label">Accuracy</div>
+                        <div class="stat-value" id="confidence">--%</div>
+                        <div class="stat-label">Confidence</div>
                     </div>
                 </div>
             </div>
@@ -1476,19 +1476,7 @@
                         </button>
                     </div>
                     <div class="ara-scan-log" id="araScanLog">
-                        <div class="ara-scan-line" style="color: var(--info);">[12:00:01] Starting hourly scan...</div>
-                        <div class="ara-scan-line" style="color: #888;">[12:00:02] Browsing: hub.jhu.edu/events</div>
-                        <div class="ara-scan-line" style="color: #888;">[12:00:05] Found 23 events on JHU Hub</div>
-                        <div class="ara-scan-line" style="color: #888;">[12:00:06] Analyzing event descriptions...</div>
-                        <div class="ara-scan-line" style="color: var(--secondary);">[12:00:08] 🍕 DETECTED: "Game Showcase" - Free pizza mentioned</div>
-                        <div class="ara-scan-line" style="color: #888;">[12:00:09] Browsing: cs.jhu.edu/events</div>
-                        <div class="ara-scan-line" style="color: var(--secondary);">[12:00:12] 🌮 DETECTED: "ACM Meeting" - Chipotle catering</div>
-                        <div class="ara-scan-line" style="color: #888;">[12:00:13] Checking Instagram @jhuhopkins...</div>
-                        <div class="ara-scan-line" style="color: #888;">[12:00:15] Scanning Outlook calendar invites...</div>
-                        <div class="ara-scan-line" style="color: var(--secondary);">[12:00:17] 🥗 DETECTED: "Research Symposium" - Catered lunch</div>
-                        <div class="ara-scan-line" style="color: var(--success);">[12:00:20] ✓ Scan complete! Found 6 free food events</div>
-                        <div class="ara-scan-line" style="color: var(--info);">[12:00:21] Sending Telegram notification...</div>
-                        <div class="ara-scan-line" style="color: var(--success);">[12:00:22] ✓ Alert sent to 47 subscribers</div>
+                        <div class="ara-scan-line" style="color: #888;">Loading real scan data...</div>
                     </div>
                 </div>
 
@@ -1698,99 +1686,8 @@ freefood = ara.<span class="function">Automation</span>(
         let isLoggedIn = false;
         let currentRating = 0;
 
-        // Events data
-        const events = [
-            {
-                id: 1,
-                title: "Game Showcase",
-                location: "Hodson Hall",
-                coords: [39.3277, -76.6217],
-                time: "Today 6:00 PM",
-                food: "Free pizza while playing student-made games!",
-                score: 95,
-                rating: 4.8,
-                reviews: 34,
-                isPublic: true,
-                isHot: true,
-                photos: ["🍕", "🎮", "🍕"],
-                tags: ["🔥 Worth It", "🍕 Great Food"]
-            },
-            {
-                id: 2,
-                title: "ACM Club Meeting",
-                location: "Malone Hall 228",
-                coords: [39.3269, -76.6211],
-                time: "Tomorrow 5:00 PM",
-                food: "Chipotle burritos and bowls provided!",
-                score: 92,
-                rating: 4.9,
-                reviews: 52,
-                isPublic: false,
-                isHot: false,
-                photos: ["🌮", "🌯", "🥤", "🌮"],
-                tags: ["🔥 Worth It", "📦 Big Portions"]
-            },
-            {
-                id: 3,
-                title: "CS Department Talk",
-                location: "Hackerman Hall B17",
-                coords: [39.3264, -76.6205],
-                time: "Today 3:30 PM",
-                food: "Pizza after the talk",
-                score: 88,
-                rating: 4.3,
-                reviews: 18,
-                isPublic: false,
-                isHot: true,
-                photos: ["🍕", "💻"],
-                tags: ["⚡ Grab & Go"]
-            },
-            {
-                id: 4,
-                title: "Research Symposium",
-                location: "Glass Pavilion",
-                coords: [39.3301, -76.6198],
-                time: "Tomorrow 11:00 AM",
-                food: "Catered lunch reception",
-                score: 85,
-                rating: 4.5,
-                reviews: 23,
-                isPublic: true,
-                isHot: false,
-                photos: ["🥗", "🥪", "☕"],
-                tags: ["🥗 Healthy", "👥 Crowded"]
-            },
-            {
-                id: 5,
-                title: "Physics Colloquium",
-                location: "Bloomberg 462",
-                coords: [39.3295, -76.6223],
-                time: "Today 4:00 PM",
-                food: "Refreshments and cookies",
-                score: 65,
-                rating: 3.8,
-                reviews: 12,
-                isPublic: false,
-                isHot: false,
-                photos: ["🍪", "☕"],
-                tags: ["😌 Chill"]
-            },
-            {
-                id: 6,
-                title: "Baltimore Food Festival",
-                location: "Inner Harbor",
-                coords: [39.2855, -76.6125],
-                time: "Saturday 12:00 PM",
-                food: "Free samples from local vendors!",
-                score: 90,
-                rating: 4.7,
-                reviews: 156,
-                isPublic: true,
-                isHot: false,
-                photos: ["🍔", "🌭", "🍦", "🥨"],
-                tags: ["🔥 Worth It", "🎉 Festival"]
-            }
-        ];
+        // Events data - populated from real Ara scans
+        const events = [];  // Starts empty, filled with real data from data/events.json
 
         // Initialize map
         const map = L.map('map').setView([39.3299, -76.6205], 15);
@@ -1802,6 +1699,18 @@ freefood = ara.<span class="function">Automation</span>(
         function renderEvents() {
             const list = document.getElementById('eventsList');
             list.innerHTML = '';
+
+            // Show message if no events
+            if (events.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #888;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">🍕</div>
+                        <div style="font-weight: 600; margin-bottom: 10px;">No events loaded yet</div>
+                        <div style="font-size: 0.9rem;">Click <strong>⚡ Ara</strong> to load real data from Ara scans</div>
+                    </div>
+                `;
+                return;
+            }
 
             events.forEach(event => {
                 // Skip private events if not logged in
@@ -1984,66 +1893,102 @@ freefood = ara.<span class="function">Automation</span>(
 
         async function loadAraData() {
             try {
-                const response = await fetch('../data/events.json');
-                araData = await response.json();
-                updateAraDisplay();
+                // Try multiple paths for GitHub Pages compatibility
+                let response;
+                const paths = ['../data/events.json', 'data/events.json', '/freefood-fetcher/data/events.json'];
+
+                for (const path of paths) {
+                    try {
+                        response = await fetch(path);
+                        if (response.ok) break;
+                    } catch (e) {
+                        continue;
+                    }
+                }
+
+                if (response && response.ok) {
+                    araData = await response.json();
+                    updateAraDisplay();
+                } else {
+                    throw new Error('Could not load data');
+                }
             } catch (e) {
                 console.log('No ara data yet:', e);
                 document.getElementById('araDataStatus').style.display = 'block';
+                document.getElementById('araScanLog').innerHTML = '<div class="ara-scan-line" style="color: #888;">No scan data loaded yet. Paste Ara output above.</div>';
             }
         }
 
         function updateAraDisplay() {
             if (!araData) return;
 
-            // Update stats
+            // Update Ara dashboard stats
             document.getElementById('araStatScanned').textContent = araData.total_scanned || 0;
             document.getElementById('araStatFood').textContent = araData.food_found || 0;
             document.getElementById('araStatSources').textContent = araData.source_urls?.length || 0;
 
+            // Update sidebar stats
+            document.getElementById('totalEvents').textContent = araData.total_scanned || 0;
+            document.getElementById('freeFood').textContent = araData.food_found || 0;
+
+            // Calculate estimated savings ($12 per meal)
+            const saved = (araData.food_found || 0) * 12;
+            document.getElementById('savedToday').textContent = '$' + saved;
+
+            // Show average confidence
+            if (araData.events && araData.events.length > 0) {
+                const avgConf = Math.round(araData.events.reduce((sum, e) => sum + (e.confidence || 0), 0) / araData.events.length);
+                document.getElementById('confidence').textContent = avgConf + '%';
+            }
+
             // Show/hide status message
-            if (araData.status === 'awaiting_scan' || araData.events?.length === 0) {
+            if (araData.status === 'awaiting_scan' || !araData.events || araData.events.length === 0) {
                 document.getElementById('araDataStatus').style.display = 'block';
+                document.getElementById('araRealDataBadge').style.display = 'none';
             } else {
                 document.getElementById('araDataStatus').style.display = 'none';
+                document.getElementById('araRealDataBadge').style.display = 'block';
+                document.getElementById('lastRealScan').textContent = new Date(araData.scan_time).toLocaleString();
 
-                // Update events list with real data
-                if (araData.events && araData.events.length > 0) {
-                    // Merge real events into our events array
-                    araData.events.forEach((realEvent, idx) => {
-                        if (!events.find(e => e.title === realEvent.title)) {
-                            events.unshift({
-                                id: 100 + idx,
-                                title: realEvent.title,
-                                location: realEvent.location,
-                                coords: getLocationCoords(realEvent.location),
-                                time: realEvent.time,
-                                food: realEvent.food,
-                                score: realEvent.confidence,
-                                rating: 0,
-                                reviews: 0,
-                                isPublic: realEvent.isPublic !== false,
-                                isHot: realEvent.confidence >= 90,
-                                photos: ['🍕'],
-                                tags: realEvent.signals?.map(s => s) || [],
-                                isReal: true
-                            });
-                        }
+                // Clear demo events and only show real ones
+                events.length = 0;
+
+                // Add real events
+                araData.events.forEach((realEvent, idx) => {
+                    events.push({
+                        id: 100 + idx,
+                        title: realEvent.title,
+                        location: realEvent.location,
+                        coords: getLocationCoords(realEvent.location),
+                        time: realEvent.time,
+                        food: realEvent.food,
+                        score: realEvent.confidence,
+                        rating: 0,
+                        reviews: 0,
+                        isPublic: realEvent.isPublic !== false,
+                        isHot: realEvent.confidence >= 90,
+                        photos: ['🍕'],
+                        tags: realEvent.signals || [],
+                        isReal: true
                     });
-                    renderEvents();
-                }
+                });
+                renderEvents();
             }
 
             // Update scan log with real data
+            const log = document.getElementById('araScanLog');
             if (araData.scan_time) {
                 const scanTime = new Date(araData.scan_time);
-                const log = document.getElementById('araScanLog');
                 log.innerHTML = `
-                    <div class="ara-scan-line" style="color: var(--info);">[${scanTime.toLocaleTimeString()}] Ara scan completed</div>
-                    ${araData.source_urls?.map(url => `<div class="ara-scan-line" style="color: #888;">Browsed: ${url}</div>`).join('') || ''}
-                    <div class="ara-scan-line" style="color: var(--success);">✓ Scanned ${araData.total_scanned} events, found ${araData.food_found} with food</div>
-                    ${araData.events?.map(e => `<div class="ara-scan-line" style="color: var(--secondary);">🍕 FOUND: "${e.title}" - ${e.food}</div>`).join('') || ''}
+                    <div class="ara-scan-line" style="color: var(--success);">[${scanTime.toLocaleTimeString()}] ✓ Ara scan completed</div>
+                    ${araData.source_urls?.map(url => `<div class="ara-scan-line" style="color: #888;">📍 Browsed: ${url}</div>`).join('') || ''}
+                    <div class="ara-scan-line" style="color: var(--info);">📊 Scanned ${araData.total_scanned} events total</div>
+                    <div class="ara-scan-line" style="color: var(--success);">🍕 Found ${araData.food_found} with free food</div>
+                    ${araData.events?.map(e => `<div class="ara-scan-line" style="color: var(--secondary);">   → "${e.title}" at ${e.location} (${e.confidence}% confidence)</div>`).join('') || ''}
+                    <div class="ara-scan-line" style="color: #666; margin-top: 10px;">Status: ${araData.message || araData.status}</div>
                 `;
+            } else {
+                log.innerHTML = '<div class="ara-scan-line" style="color: #888;">Waiting for scan data...</div>';
             }
         }
 
