@@ -1997,11 +1997,9 @@
                 <button class="review-tag" onclick="toggleTag(this)">💀 Gone Fast</button>
             </div>
 
-            <textarea class="review-textarea" placeholder="Share your experience..."></textarea>
+            <textarea class="review-textarea" id="reviewText" placeholder="Share your experience..."></textarea>
 
-            <div class="photo-upload" onclick="uploadPhoto()">
-                📸 Click to add photos
-            </div>
+            <input type="text" id="reviewAuthor" class="review-textarea" placeholder="Your name (optional)" style="height:auto; padding: 12px 15px; margin-bottom: 15px;" />
 
             <button class="submit-review-btn" onclick="submitReview()">
                 Submit Review (+10 XP)
@@ -2608,17 +2606,16 @@ freefood = ara.<span class="function">Automation</span>(
         let currentReviewEventId = null;
 
         function showReviewModal(eventId) {
-            if (!isLoggedIn) {
-                showLoginModal();
-                return;
-            }
-            const event = events.find(e => e.id === eventId);
+            const ev = events.find(e => e.id === eventId);
+            if (!ev) { showToast('Could not find event. Try refreshing.'); return; }
+
             currentReviewEventId = eventId;
             currentRating = 0;
             document.querySelectorAll('.rating-star').forEach(s => { s.textContent = '☆'; s.classList.remove('active'); });
             document.querySelectorAll('.review-tag').forEach(t => t.classList.remove('selected'));
-            document.querySelector('.review-textarea').value = '';
-            document.getElementById('reviewEventName').textContent = event.title;
+            document.getElementById('reviewText').value = '';
+            document.getElementById('reviewAuthor').value = isLoggedIn ? 'Leo Z' : '';
+            document.getElementById('reviewEventName').textContent = ev.title;
             document.getElementById('reviewModal').classList.add('show');
         }
 
@@ -2635,19 +2632,19 @@ freefood = ara.<span class="function">Automation</span>(
             el.classList.toggle('selected');
         }
 
-        function uploadPhoto() {
-            showToast('📸 Photo upload coming soon!');
-        }
-
         async function submitReview() {
-            const text = document.querySelector('.review-textarea').value.trim();
+            const text = document.getElementById('reviewText').value.trim();
+            const author = document.getElementById('reviewAuthor').value.trim() || 'Anonymous';
             const tags = [...document.querySelectorAll('.review-tag.selected')].map(t => t.textContent.trim());
-            const author = isLoggedIn ? (currentUser?.name || 'JHU Student') : 'Anonymous';
 
             if (!currentRating && !text) {
-                showToast('⚠️ Add a rating or write something!');
+                showToast('Add a star rating or write something first!');
                 return;
             }
+
+            const btn = document.querySelector('.submit-review-btn');
+            btn.textContent = 'Submitting...';
+            btn.disabled = true;
 
             try {
                 const res = await fetch('/api/reviews', {
@@ -2661,25 +2658,31 @@ freefood = ara.<span class="function">Automation</span>(
                         tags
                     })
                 });
-                if (!res.ok) throw new Error('Failed');
+
+                if (!res.ok) throw new Error(`Server error ${res.status}`);
                 const saved = await res.json();
 
-                // Inject review into the event's reviewsList immediately
+                // Update event in memory immediately
                 const ev = events.find(e => e.id === currentReviewEventId);
                 if (ev) {
                     if (!ev.reviewsList) ev.reviewsList = [];
                     ev.reviewsList.unshift({ author: saved.author, timeAgo: 'just now', text: saved.text, images: [] });
                     ev.reviews = (ev.reviews || 0) + 1;
-                    if (saved.rating) {
-                        ev.rating = ev.reviews === 1 ? saved.rating : parseFloat(((ev.rating * (ev.reviews - 1) + saved.rating) / ev.reviews).toFixed(1));
+                    if (saved.rating > 0) {
+                        const prev = (ev.rating || 0) * (ev.reviews - 1);
+                        ev.rating = parseFloat(((prev + saved.rating) / ev.reviews).toFixed(1));
                     }
                 }
 
                 document.getElementById('reviewModal').classList.remove('show');
                 renderEvents();
-                showToast('🎉 Review submitted! +10 XP');
+                showToast('Review submitted! +10 XP');
             } catch (e) {
-                showToast('❌ Could not save review. Is the server running?');
+                console.error('Review submit error:', e);
+                showToast('Could not save review — make sure the server is running on port 8080.');
+            } finally {
+                btn.textContent = 'Submit Review (+10 XP)';
+                btn.disabled = false;
             }
         }
 
