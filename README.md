@@ -1,4 +1,4 @@
-# 🍕 Free Food Fetcher v2.0
+# 🍕 Free Food Fetcher v2.0 - We won the hackathon! 
 
 **Never miss free food on campus again.**
 
